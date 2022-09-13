@@ -1,6 +1,11 @@
 import {AppBar, Box, Button, Container, Stack, Toolbar, Typography} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function Inicio(){
+
+    let navigate = useNavigate();
+
+
     return(
         <>
             <AppBar position="relative" sx={{display: 'flex', alignItems: 'center'}}>
@@ -30,10 +35,13 @@ export default function Inicio(){
                         <Button
                             variant="contained"
                             sx={{mt:4, mb:1}}
+                            onClick={()=>navigate('/nova')}
+                            
                         >Nova Fiscalização</Button>
                     </Stack>
                     <Stack>
-                        <Button variant="outlined">Banco de Dados</Button>
+                        <Button variant="outlined"
+                        >Banco de Dados</Button>
                     </Stack>
                 </Container>
             </Box>
