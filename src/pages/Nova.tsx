@@ -23,6 +23,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import React, {useState} from "react";
 import Grid from '@mui/material/Unstable_Grid2';
+import {fiscalizado} from "../assets/Tipos";
+import {salvar} from "../utils/FirebaseCrud";
 
 
 const Item = styled(Paper)(({theme}) => ({
@@ -30,6 +32,7 @@ const Item = styled(Paper)(({theme}) => ({
     ...theme.typography.body2,
     padding: theme.spacing(1),
     textAlign: 'center',
+    component: 'span',
     color: theme.palette.text.secondary,
 }));
 
@@ -38,7 +41,6 @@ export default function Nova() {
 
 
 //Aqui vamos fazer algo muito importante: usar um único onChance para controlar o form todo
-
 //Primeiro setamos o objeto do formulário
 
 
@@ -66,9 +68,26 @@ export default function Nova() {
 
     function handleSubmit(e:any) {
         e.preventDefault();
-        console.log("chegamos aqui");
+        console.log("Tentando salvar os resultados: ");
         console.log(state);
 
+        salvar(state);
+
+
+
+        //zerando o state novamente
+        setState({
+            nomePermissionario: "",
+            cotaxPermissionario: "",
+            ponto: "",
+            selo: "",
+            prefixo: "",
+            placa: "",
+            vencimentoPermissionario: "",
+            nomeCondutor: "",
+            cotaxCondutor: "",
+            vencimentoCondutor: ""
+        })
     }
 
     const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
@@ -88,12 +107,12 @@ export default function Nova() {
 
 
     return (
-        <>
+        <div>
             <AppBar position="relative" color="primary" sx={{display: 'flex', alignItems: 'center'}}>
                 <Toolbar>
                     <IconButton onClick={() => navigate('/')}><Icon className="botao"
                                                                     fontSize="medium">arrow_back</Icon></IconButton>
-                    <Typography variant="h5" align="center">
+                    <Typography component={"span"} variant="h5" align="center">
                         Fiscalização de Taxi
                     </Typography>
                 </Toolbar>
@@ -104,21 +123,23 @@ export default function Nova() {
 
                 <Container>
 
-
+                    <IconButton onClick={handleClickOpen}><Icon color="primary" fontSize="large"
+                    >add_circle</Icon></IconButton>
+                    <Divider sx={{mb: 2}}/>
                     <Typography
+                        component={"span"}
                         variant="body1"
                         align="center"
                         color="text.secondary"
                         paragraph
                     >
-                        Clique no ícone abaixo para adicionar uma nova entrada:
+                        Clique no ícone acima para adicionar uma nova entrada:
                     </Typography>
 
-                    <Divider sx={{mb: 2}}/>
 
 
-                    <IconButton onClick={handleClickOpen}><Icon color="primary" fontSize="large"
-                                      >add_circle</Icon></IconButton>
+
+
 
                     <Dialog open={open} onClose={handleClose}>
 
@@ -326,6 +347,6 @@ export default function Nova() {
 
                 </Container>
             </Box>
-        </>
+        </div>
     )
 }
