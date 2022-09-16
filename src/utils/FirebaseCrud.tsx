@@ -13,15 +13,15 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
+
+//SET
 async function putFiscalizacao(data: any) {
     addDoc(collection(db, "/fiscalizacao"), data);
 }
 
-export function salvar(dados: any){
-
+export function salvar(dados: any) {
     putFiscalizacao(dados).then(
         response => {
             console.log('Dados salvos com sucesso!');
@@ -30,5 +30,18 @@ export function salvar(dados: any){
         console.log('Algum erro ocorreu. Segue: ');
         console.log(error);
     })
-
 }
+
+//GET
+ export async function recuperar(): Promise<any>{
+    const resultadosCollection = collection(db, "fiscalizacao");
+    const resultadosSnapshot = await getDocs(resultadosCollection);
+    const resultadosLista = resultadosSnapshot.docs.map(doc => doc.data());
+
+    return resultadosLista;
+}
+
+
+
+
+

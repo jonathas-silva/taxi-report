@@ -2,6 +2,8 @@ import {
     AppBar,
     Box,
     Button,
+    Card,
+    CardContent,
     Container,
     Dialog,
     Divider,
@@ -21,20 +23,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Grid from '@mui/material/Unstable_Grid2';
 import {fiscalizado} from "../assets/Tipos";
-import {salvar} from "../utils/FirebaseCrud";
-
-
-const Item = styled(Paper)(({theme}) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    component: 'span',
-    color: theme.palette.text.secondary,
-}));
+import {recuperar, salvar} from "../utils/FirebaseCrud";
+import DocumentData from "firebase/compat";
 
 
 export default function Nova() {
@@ -54,7 +47,8 @@ export default function Nova() {
         vencimentoPermissionario: "",
         nomeCondutor: "",
         cotaxCondutor: "",
-        vencimentoCondutor: ""
+        vencimentoCondutor: "",
+        observacoes: ""
     });
 
     function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
@@ -66,13 +60,14 @@ export default function Nova() {
         });
     }
 
-    function handleSubmit(e:any) {
+    function handleSubmit(e: any) {
         e.preventDefault();
+
         console.log("Tentando salvar os resultados: ");
         console.log(state);
 
-        salvar(state);
 
+        salvar(state);
 
 
         //zerando o state novamente
@@ -86,12 +81,13 @@ export default function Nova() {
             vencimentoPermissionario: "",
             nomeCondutor: "",
             cotaxCondutor: "",
-            vencimentoCondutor: ""
+            vencimentoCondutor: "",
+            observacoes: ""
         })
     }
 
     const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
-    function switchHandle(e: any){
+    function switchHandle(e: any) {
         setcondutorIgualPerm((e as any).target.checked); //vai retornar um false or true
     }
 
@@ -104,6 +100,19 @@ export default function Nova() {
         setOpen(false)
     };
 
+    const [lista, setLista] = useState<Promise<any>>();
+    useEffect(() => {
+
+        //Busca o banco de dados sempre que o modal de inserção for alterado
+        recuperar().then(
+            response => {
+                setLista(response);
+            }
+        ).catch(error => {
+            console.log('Um erro ocorreu: '+ error);
+        })
+        console.log(lista);
+    }, [open]);
 
 
     return (
@@ -121,9 +130,32 @@ export default function Nova() {
                 pt: 4
             }}>
 
+
+                {
+                    lista?.map ( x => (
+
+                        <Card sx={{m:1}}>
+                            <CardContent>
+                                <Grid container>
+                                    <Grid xs={12}>
+                                        Permissionário: {x.nomePermissionario}
+                                    </Grid>
+                                    <Grid xs={6}>
+                                        Cotax: {x.cotaxPermissionario}
+                                    </Grid>
+                                    <Grid xs={6}>
+                                        Validade: {x.vencimentoPermissionario}
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
+                    ))
+                }
+
+
                 <Container>
 
-                    <IconButton onClick={handleClickOpen}><Icon color="primary" fontSize="large"
+                    <IconButton onClick={() => handleClickOpen()}><Icon color="primary" fontSize="large"
                     >add_circle</Icon></IconButton>
                     <Divider sx={{mb: 2}}/>
                     <Typography
@@ -137,24 +169,17 @@ export default function Nova() {
                     </Typography>
 
 
-
-
-
-
-                    <Dialog open={open} onClose={handleClose}>
+                    <Dialog open={open} onClose={() => handleClose()}>
 
                         <DialogTitle>Nova entrada</DialogTitle>
                         <DialogContent>
-                            <DialogContentText>
 
 
                                 <form id="fiscalizacaoForm" onSubmit={handleSubmit}>
                                     <Grid container spacing={1}>
 
-                                        <Grid xs={12}>
-                                            Veículo
-                                            <Item>
-
+                                        Veículo
+                                        <Grid xs={12} className="papel" sx={{mb:2, p:1}}>
                                                 <Grid container>
                                                     <Grid xs={12} sm={6}>
                                                         <TextField
@@ -209,12 +234,11 @@ export default function Nova() {
                                                     </Grid>
                                                 </Grid>
 
-                                            </Item></Grid>
+                                            </Grid>
 
+                                        Permissionário
+                                        <Grid xs={12} className="papel" sx={{mb:2, p:1}}>
 
-                                        <Grid xs={12} sx={{mt: 2}}>
-                                            Permissionário
-                                            <Item>
                                                 <Grid container>
                                                     <Grid xs={12} sm={12}>
                                                         <TextField
@@ -254,13 +278,14 @@ export default function Nova() {
                                                     </Grid>
 
                                                 </Grid>
-                                            </Item>
+
                                         </Grid>
 
-                                        <Grid xs={12} sx={{mt: 2}}>
-                                            Condutor
+                                        Condutor
+                                        <Grid xs={12} className="papel" sx={{mb:2, p:1}}>
 
-                                            <Item>
+
+
                                                 <FormControlLabel
                                                     control={
                                                         <Switch defaultChecked={true}
@@ -311,35 +336,37 @@ export default function Nova() {
 
                                                 </Grid>
 
-                                            </Item>
+
                                         </Grid>
 
-                                        <Grid xs={12} sx={{mt:2}}>
+                                        <Grid xs={12} sx={{mt: 2, p:1}} className="papel">
                                             Observações
-                                            <Item>
+
                                                 <TextField
                                                     fullWidth={true}
                                                     id="observacoes"
                                                     variant="standard"
+                                                    value={state.observacoes}
+                                                    onChange={handleChange}
                                                     placeholder="Autuações, notificações ou qualquer outra observação sobre esta fiscalização"
                                                     multiline
                                                     rows={5}
                                                 />
-                                            </Item>
+
                                         </Grid>
 
                                     </Grid>
                                 </form>
 
 
-                            </DialogContentText>
+
                         </DialogContent>
 
                         <DialogActions>
-                            <Button onClick={handleClose}>Cancelar</Button>
+                            <Button onClick={() => handleClose()}>Cancelar</Button>
 
                             {/*botão de submit do formulário 'fiscalizacaoForm'*/}
-                            <Button form="fiscalizacaoForm" type="submit" onClick={handleClose} >Salvar</Button>
+                            <Button form="fiscalizacaoForm" type="submit" onClick={() => handleClose()}>Salvar</Button>
                         </DialogActions>
 
                     </Dialog>

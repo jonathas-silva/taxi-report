@@ -1,3 +1,11 @@
 .botao{
     color: white;
 }
+
+/*Uma formatação tipo paper, mais limpa e equilibrada do que o componente
+paper da MUI*/
+.papel{
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+}
