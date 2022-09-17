@@ -28,6 +28,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import {fiscalizado} from "../assets/Tipos";
 import {recuperar, salvar} from "../utils/FirebaseCrud";
 import DocumentData from "firebase/compat";
+import {getFiscalizacao, putFiscalizacao} from "../utils/LocalCrud";
 
 
 export default function Nova() {
@@ -36,20 +37,39 @@ export default function Nova() {
 //Aqui vamos fazer algo muito importante: usar um único onChance para controlar o form todo
 //Primeiro setamos o objeto do formulário
 
-
-    const [state, setState] = useState({
+    const estadoInicial: fiscalizado = {
         nomePermissionario: "",
-        cotaxPermissionario: "",
-        ponto: "",
+        cotaxPermissionario: 0,
+        ponto: 0,
         selo: "",
-        prefixo: "",
+        prefixo: 0,
         placa: "",
         vencimentoPermissionario: "",
         nomeCondutor: "",
-        cotaxCondutor: "",
+        cotaxCondutor: 0,
         vencimentoCondutor: "",
         observacoes: ""
-    });
+    }
+
+    const [open, setOpen] = useState(false);
+    const handleClickOpen = () => {
+        setOpen(true)
+    };
+    const handleClose = () => {
+        setOpen(false);
+        setAtualizar(!atualizar)
+    };
+
+    const [atualizar, setAtualizar] = useState(false);
+    const [resultados, setResultados] = useState<fiscalizado[]>([]);
+    const [state, setState] = useState<fiscalizado>(estadoInicial);
+
+    //use effect controlado pelo estado de 'atualizar'. Ou seja, quando fechar o modal, o programa renderiza
+    useEffect(() => {
+        setResultados(getFiscalizacao());
+        console.log(resultados);
+    }, [atualizar])
+
 
     function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
         e.preventDefault();
@@ -66,24 +86,10 @@ export default function Nova() {
         console.log("Tentando salvar os resultados: ");
         console.log(state);
 
-
-        salvar(state);
-
-
+        putFiscalizacao(state);
         //zerando o state novamente
-        setState({
-            nomePermissionario: "",
-            cotaxPermissionario: "",
-            ponto: "",
-            selo: "",
-            prefixo: "",
-            placa: "",
-            vencimentoPermissionario: "",
-            nomeCondutor: "",
-            cotaxCondutor: "",
-            vencimentoCondutor: "",
-            observacoes: ""
-        })
+        setState(estadoInicial);
+        setAtualizar(!atualizar);
     }
 
     const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
@@ -92,27 +98,6 @@ export default function Nova() {
     }
 
     let navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-    const handleClickOpen = () => {
-        setOpen(true)
-    };
-    const handleClose = () => {
-        setOpen(false)
-    };
-
-    const [lista, setLista] = useState<Promise<any>>();
-    useEffect(() => {
-
-        //Busca o banco de dados sempre que o modal de inserção for alterado
-        recuperar().then(
-            response => {
-                setLista(response);
-            }
-        ).catch(error => {
-            console.log('Um erro ocorreu: '+ error);
-        })
-        console.log(lista);
-    }, [open]);
 
 
     return (
@@ -130,27 +115,41 @@ export default function Nova() {
                 pt: 4
             }}>
 
+                {resultados.map(x => (
+                    <Card sx={{m: 1}} variant="elevation">
+                        <CardContent>
 
-                {
-                    lista?.map ( x => (
 
-                        <Card sx={{m:1}}>
-                            <CardContent>
-                                <Grid container>
-                                    <Grid xs={12}>
-                                        Permissionário: {x.nomePermissionario}
-                                    </Grid>
-                                    <Grid xs={6}>
-                                        Cotax: {x.cotaxPermissionario}
-                                    </Grid>
-                                    <Grid xs={6}>
-                                        Validade: {x.vencimentoPermissionario}
-                                    </Grid>
-                                </Grid>
-                            </CardContent>
-                        </Card>
-                    ))
-                }
+                            <Grid container sx={{textAlign: 'left'}}>
+                                <Grid xs={4}><span className="label">Ponto:</span><span
+                                    className="dados">{x.ponto}</span></Grid>
+                                <Grid xs={4}><span className="label">Placa:</span><span
+                                    className="dados">{x.placa}</span></Grid>
+                                <Grid xs={4}><span className="label">Selo:</span><span
+                                    className="dados">{x.selo}</span></Grid>
+                                <Grid xs={12} sx={{mt:1}}><span className="label ">Perm.:</span><span
+                                    className="dados">{x.nomePermissionario}</span></Grid>
+                                <Grid xs={6}><span className="label detalhe">Cotax: </span><span
+                                    className="dados detalhe">{x.cotaxPermissionario}</span></Grid>
+                                <Grid xs={6}><span className="label detalhe">Vencimento: </span><span
+                                    className="dados detalhe">{x.vencimentoPermissionario}</span></Grid>
+                                {
+                                    x.nomeCondutor == "" ? <>
+                                        </> :
+                                        <>
+                                            <Grid xs={12} sx={{mt:1}}><span className="label">Cond.: </span><span
+                                                className="dados">{x.nomeCondutor}</span></Grid>
+                                            <Grid xs={6}><span className="label detalhe">Cotax: </span><span
+                                                className="dados detalhe">{x.cotaxCondutor}</span></Grid>
+                                            <Grid xs={6}><span className="label detalhe">Vencimento: </span><span
+                                                className="dados detalhe">{x.vencimentoCondutor}</span></Grid></>
+                                }
+                            </Grid>
+
+
+                        </CardContent>
+                    </Card>
+                ))}
 
 
                 <Container>
@@ -175,189 +174,187 @@ export default function Nova() {
                         <DialogContent>
 
 
-                                <form id="fiscalizacaoForm" onSubmit={handleSubmit}>
-                                    <Grid container spacing={1}>
+                            <form id="fiscalizacaoForm" onSubmit={handleSubmit}>
+                                <Grid container spacing={1}>
 
-                                        Veículo
-                                        <Grid xs={12} className="papel" sx={{mb:2, p:1}}>
-                                                <Grid container>
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="prefixo"
-                                                            variant="standard"
-                                                            label="prefixo"
-                                                            type="number"
-                                                            value={state.prefixo}
-                                                            onChange={handleChange}
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="placa"
-                                                            variant="standard"
-                                                            label="Placa"
-                                                            value={state.placa}
-                                                            onChange={handleChange}
-                                                        >
-
-                                                        </TextField>
-                                                    </Grid>
-
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="selo"
-                                                            variant="standard"
-                                                            label="Validade selo"
-                                                            type="date"
-                                                            value={state.selo}
-                                                            onChange={handleChange}
-                                                            InputLabelProps={{
-                                                                shrink: true,
-                                                            }}
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="ponto"
-                                                            variant="standard"
-                                                            value={state.ponto}
-                                                            onChange={handleChange}
-                                                            label="ponto"
-                                                            type="number"
-                                                        />
-                                                    </Grid>
-                                                </Grid>
-
+                                    Veículo
+                                    <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>
+                                        <Grid container>
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="prefixo"
+                                                    variant="standard"
+                                                    label="prefixo"
+                                                    type="number"
+                                                    value={state.prefixo}
+                                                    onChange={handleChange}
+                                                />
                                             </Grid>
 
-                                        Permissionário
-                                        <Grid xs={12} className="papel" sx={{mb:2, p:1}}>
-
-                                                <Grid container>
-                                                    <Grid xs={12} sm={12}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="nomePermissionario"
-                                                            variant="standard"
-                                                            label="Nome"
-                                                            value={state.nomePermissionario}
-                                                            onChange={handleChange}
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="cotaxPermissionario"
-                                                            variant="standard"
-                                                            label="Cotax"
-                                                            type="number"
-                                                            value={state.cotaxPermissionario}
-                                                            onChange={handleChange}
-                                                        />
-                                                    </Grid>
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="vencimentoPermissionario"
-                                                            variant="standard"
-                                                            value={state.vencimentoPermissionario}
-                                                            onChange={handleChange}
-                                                            label="validade"
-                                                            type="date"
-                                                            InputLabelProps={{
-                                                                shrink: true,
-                                                            }}
-                                                        />
-                                                    </Grid>
-
-                                                </Grid>
-
-                                        </Grid>
-
-                                        Condutor
-                                        <Grid xs={12} className="papel" sx={{mb:2, p:1}}>
-
-
-
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch defaultChecked={true}
-                                                                onChange={switchHandle}/>
-                                                    }
-                                                    label="Condutor e permissionário são a mesma pessoa"
-                                                />
-                                                <Grid container>
-                                                    <Grid xs={12} sm={12}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="nomeCondutor"
-                                                            disabled={condutorIgualPerm}
-                                                            value={condutorIgualPerm ? state.nomePermissionario : state.nomeCondutor}
-                                                            onChange={handleChange}
-                                                            variant="standard"
-                                                            label="Nome"
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="cotaxCondutor"
-                                                            value={condutorIgualPerm ? state.cotaxPermissionario : state.cotaxCondutor}
-                                                            disabled={condutorIgualPerm}
-                                                            onChange={handleChange}
-                                                            variant="standard"
-                                                            label="Cotax"
-                                                            type="number"
-                                                        />
-                                                    </Grid>
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="vencimentoCondutor"
-                                                            disabled={condutorIgualPerm}
-                                                            variant="standard"
-                                                            value={condutorIgualPerm ? state.vencimentoPermissionario : state.vencimentoCondutor}
-                                                            onChange={handleChange}
-                                                            label="validade"
-                                                            type="date"
-                                                            InputLabelProps={{
-                                                                shrink: true,
-                                                            }}
-                                                        />
-                                                    </Grid>
-
-                                                </Grid>
-
-
-                                        </Grid>
-
-                                        <Grid xs={12} sx={{mt: 2, p:1}} className="papel">
-                                            Observações
-
+                                            <Grid xs={12} sm={6}>
                                                 <TextField
-                                                    fullWidth={true}
-                                                    id="observacoes"
+                                                    fullWidth
+                                                    id="placa"
                                                     variant="standard"
-                                                    value={state.observacoes}
+                                                    label="Placa"
+                                                    value={state.placa}
                                                     onChange={handleChange}
-                                                    placeholder="Autuações, notificações ou qualquer outra observação sobre esta fiscalização"
-                                                    multiline
-                                                    rows={5}
+                                                >
+
+                                                </TextField>
+                                            </Grid>
+
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="selo"
+                                                    variant="standard"
+                                                    label="Validade selo"
+                                                    type="date"
+                                                    value={state.selo}
+                                                    onChange={handleChange}
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
                                                 />
+                                            </Grid>
+
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="ponto"
+                                                    variant="standard"
+                                                    value={state.ponto}
+                                                    onChange={handleChange}
+                                                    label="ponto"
+                                                    type="number"
+                                                />
+                                            </Grid>
+                                        </Grid>
+
+                                    </Grid>
+
+                                    Permissionário
+                                    <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>
+
+                                        <Grid container>
+                                            <Grid xs={12} sm={12}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="nomePermissionario"
+                                                    variant="standard"
+                                                    label="Nome"
+                                                    value={state.nomePermissionario}
+                                                    onChange={handleChange}
+                                                />
+                                            </Grid>
+
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="cotaxPermissionario"
+                                                    variant="standard"
+                                                    label="Cotax"
+                                                    type="number"
+                                                    value={state.cotaxPermissionario}
+                                                    onChange={handleChange}
+                                                />
+                                            </Grid>
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="vencimentoPermissionario"
+                                                    variant="standard"
+                                                    value={state.vencimentoPermissionario}
+                                                    onChange={handleChange}
+                                                    label="validade"
+                                                    type="date"
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                />
+                                            </Grid>
 
                                         </Grid>
 
                                     </Grid>
-                                </form>
 
+                                    Condutor
+                                    <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>
+
+
+                                        <FormControlLabel
+                                            control={
+                                                <Switch defaultChecked={true}
+                                                        onChange={switchHandle}/>
+                                            }
+                                            label="Condutor e permissionário são a mesma pessoa"
+                                        />
+                                        <Grid container>
+                                            <Grid xs={12} sm={12}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="nomeCondutor"
+                                                    disabled={condutorIgualPerm}
+                                                    value={condutorIgualPerm ? state.nomePermissionario : state.nomeCondutor}
+                                                    onChange={handleChange}
+                                                    variant="standard"
+                                                    label="Nome"
+                                                />
+                                            </Grid>
+
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="cotaxCondutor"
+                                                    value={condutorIgualPerm ? state.cotaxPermissionario : state.cotaxCondutor}
+                                                    disabled={condutorIgualPerm}
+                                                    onChange={handleChange}
+                                                    variant="standard"
+                                                    label="Cotax"
+                                                    type="number"
+                                                />
+                                            </Grid>
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="vencimentoCondutor"
+                                                    disabled={condutorIgualPerm}
+                                                    variant="standard"
+                                                    value={condutorIgualPerm ? state.vencimentoPermissionario : state.vencimentoCondutor}
+                                                    onChange={handleChange}
+                                                    label="validade"
+                                                    type="date"
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                />
+                                            </Grid>
+
+                                        </Grid>
+
+
+                                    </Grid>
+
+                                    <Grid xs={12} sx={{mt: 2, p: 1}} className="papel">
+                                        Observações
+
+                                        <TextField
+                                            fullWidth={true}
+                                            id="observacoes"
+                                            variant="standard"
+                                            value={state.observacoes}
+                                            onChange={handleChange}
+                                            placeholder="Autuações, notificações ou qualquer outra observação sobre esta fiscalização"
+                                            multiline
+                                            rows={5}
+                                        />
+
+                                    </Grid>
+
+                                </Grid>
+                            </form>
 
 
                         </DialogContent>

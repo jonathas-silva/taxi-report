@@ -9,3 +9,18 @@ paper da MUI*/
     border-radius: 6px;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
 }
+
+.label{
+    font-weight: lighter;
+    font-size: 0.85em;
+    color: darkslategray;
+}
+
+.dados{
+    margin-left: 2px;
+}
+
+.detalhe{
+    color: darkgray;
+    font-weight: lighter;
+}

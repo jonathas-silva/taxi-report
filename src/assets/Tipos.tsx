@@ -10,5 +10,6 @@ export type fiscalizado = {
     vencimentoPermissionario: string,
     nomeCondutor: string,
     cotaxCondutor: number,
-    vencimentoCondutor: string
+    vencimentoCondutor: string,
+    observacoes: string;
 }
