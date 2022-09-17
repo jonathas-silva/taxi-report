@@ -3,7 +3,10 @@ import {
     Box,
     Button,
     Card,
+    CardActions,
     CardContent,
+    CardHeader,
+    Collapse,
     Container,
     Dialog,
     Divider,
@@ -33,6 +36,7 @@ import {fiscalizado} from "../assets/Tipos";
 import {recuperar, salvar} from "../utils/FirebaseCrud";
 import DocumentData from "firebase/compat";
 import {getFiscalizacao, putFiscalizacao} from "../utils/LocalCrud";
+import {ExpandMore} from "@mui/icons-material";
 
 
 export default function Nova() {
@@ -140,6 +144,12 @@ export default function Nova() {
     let navigate = useNavigate();
 
 
+    const [expandedId, setExpandedId] = React.useState(-1);
+
+    const handleExpandClick = (i: number) => {
+        setExpandedId(expandedId === i ? -1 : i);
+    };
+
     return (
         <div>
             <AppBar position="relative" color="primary" sx={{display: 'flex', alignItems: 'center'}}>
@@ -155,27 +165,70 @@ export default function Nova() {
                 pt: 4
             }}>
 
-                {resultados.map(x => (
-                    <Card sx={{m: 1}} variant="elevation">
+                {resultados.map((x, index) => (
+                    <Card sx={{m: 1}} variant="elevation" key={index}>
+                        <CardHeader sx={{textAlign: 'left'}}
+                                    action={
+                                        <IconButton>
+                                            <Icon color="warning">delete</Icon>
+                                        </IconButton>
+                                    }
+                                    title={`Permissão ${x.prefixo}`}
+                                    subheader={x.nomePermissionario}
+                        >
+                        </CardHeader>
                         <CardContent>
-                            <Box sx={{display: 'flex', alignItems: 'center', justifyContent:'space-between'}}>
+                            {/*               <Box sx={{display: 'flex', alignItems: 'center', justifyContent:'space-between'}}>
                                 <Typography variant="h6">Permissão {x.prefixo}</Typography>
                                 <Typography variant="subtitle1" className="label">{x.horario}</Typography>
-                            </Box>
-                            <Box sx={{display: 'flex', justifyContent:'space-between'}}>
-                                <Typography className="detalhe">{x.placa} </Typography>
+                            </Box>*/}
+                            <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                                <Typography className="detalhe">{x.horario} </Typography>
 
                                 {
                                     x.status == "Liberado" ?
-                                    <Typography className="coisaBoa">{x.status}</Typography> :
+                                        <Typography className="coisaBoa">{x.status}</Typography> :
                                         <Typography className="coisaRuim">{x.status}</Typography>
                                 }
 
-
                             </Box>
-
-
                         </CardContent>
+                        <CardActions disableSpacing>
+
+                            <IconButton onClick={() => handleExpandClick(index)}><Icon>expand_more</Icon></IconButton>
+
+                        </CardActions>
+                        <Collapse in={expandedId === index} timeout="auto" unmountOnExit>
+                            <CardContent>
+
+                                <Grid container className="infoAdicionais">
+                                    <Grid xs={4} className="label">Cotax</Grid>
+                                    <Grid xs={8} className="dados">{x.cotaxPermissionario}</Grid>
+                                    <Grid xs={4} className="label">Válidade</Grid>
+                                    <Grid xs={8} className="dados">{x.vencimentoPermissionario}</Grid>
+                                    <Grid xs={4} className="label">Placa</Grid>
+                                    <Grid xs={8} className="dados">{x.placa}</Grid>
+                                    <Grid xs={4} className="label">Selo</Grid>
+                                    <Grid xs={8} className="dados">{x.vencimentoCondutor}</Grid>
+                                    <Grid xs={4} className="label">Ponto</Grid>
+                                    <Grid xs={8} className="dados">{x.ponto}</Grid>
+                                    <Grid xs={4} className="label">Cond.</Grid>
+
+                                    {
+                                        x.nomeCondutor == "" ?
+                                            <Grid xs={8} className="dados">O mesmo</Grid> :
+                                        <>
+                                        <Grid xs={8} className="dados"> {x.nomeCondutor}</Grid>
+                                        <Grid xs={4} className="label">Cotax cond.</Grid>
+                                        <Grid xs={8} className="dados"> {x.cotaxCondutor}</Grid>
+                                        <Grid xs={4} className="label">Validade cond.</Grid>
+                                        <Grid xs={8} className="dados"> {x.vencimentoCondutor}</Grid>
+                                        </>
+                                    }
+                                </Grid>
+
+                            </CardContent>
+                        </Collapse>
                     </Card>
                 ))}
 

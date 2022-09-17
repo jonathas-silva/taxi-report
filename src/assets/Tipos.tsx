@@ -3,14 +3,14 @@
 export type fiscalizado = {
     nomePermissionario: string,
     cotaxPermissionario: number,
-    ponto: number,
-    selo: string,
-    prefixo: number,
-    placa: string,
     vencimentoPermissionario: string,
     nomeCondutor: string,
     cotaxCondutor: number,
     vencimentoCondutor: string,
+    ponto: number,
+    selo: string,
+    prefixo: number,
+    placa: string,
     status: string,
     observacoes?: string,
     horario: string

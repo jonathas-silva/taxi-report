@@ -2,6 +2,7 @@
     color: white;
 }
 
+
 /*Uma formatação tipo paper, mais limpa e equilibrada do que o componente
 paper da MUI*/
 .papel{
@@ -11,16 +12,21 @@ paper da MUI*/
 }
 
 .label{
-    color: dimgray;
+    font-size: medium;
+    font-weight: lighter;
+    color: lightslategray;
 }
 
 .dados{
-    margin-left: 2px;
+    font-size: 1em;
+    /*font-weight: bold;*/
+    color: black;
+    /*text-align: center;*/
 }
 
 .detalhe{
+
     color: darkgray;
-    font-weight: lighter;
 }
 
 .coisaBoa{
@@ -29,4 +35,10 @@ paper da MUI*/
 
 .coisaRuim{
     color: red;
+}
+
+.infoAdicionais{
+    color: whitesmoke;
+    text-align: left;
+    /*border: 1px solid lightgray;*/
 }
