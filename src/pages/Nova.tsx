@@ -7,9 +7,13 @@ import {
     Container,
     Dialog,
     Divider,
+    FormControl,
     FormControlLabel,
     IconButton,
+    InputLabel,
+    MenuItem,
     Paper,
+    Select, SelectChangeEvent,
     Stack, styled, Switch, TextField,
     ThemeProvider,
     Toolbar,
@@ -48,11 +52,35 @@ export default function Nova() {
         nomeCondutor: "",
         cotaxCondutor: 0,
         vencimentoCondutor: "",
-        observacoes: ""
+        observacoes: "",
+        status: "Liberado",
+        horario: ""
     }
 
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => {
+
+
+        /*Setando a data e hora no momento em que abriu-se o modal*/
+
+        let data = new Date();
+
+        //Aqui estamos formatando a data e hora para o formato brasileiro, e eliminando os segundos
+        const opcoes: Intl.DateTimeFormatOptions = {
+            day: '2-digit',
+            month: '2-digit',
+            year: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        }
+
+        const horarioFormatado: string = data.toLocaleString('pt-BR', opcoes);
+
+        setState({
+            ...state,
+            horario: horarioFormatado
+        });
+
         setOpen(true)
     };
     const handleClose = () => {
@@ -64,14 +92,24 @@ export default function Nova() {
     const [resultados, setResultados] = useState<fiscalizado[]>([]);
     const [state, setState] = useState<fiscalizado>(estadoInicial);
 
+    const [status, setStatus] = useState<string>('');
+
     //use effect controlado pelo estado de 'atualizar'. Ou seja, quando fechar o modal, o programa renderiza
     useEffect(() => {
         setResultados(getFiscalizacao());
-        console.log(resultados);
     }, [atualizar])
 
+    //Aqui eu criei um evento só para lidar com o select, devido a tipagem
+    //gerar alguns erros em tempo de execução
+    const handleSelectChange = (event: SelectChangeEvent) => {
+        const value = event.target.value;
+        setState({
+            ...state,
+            status: value
+        });
+    };
 
-    function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
+    function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void {
         e.preventDefault();
         const value = e.target.value;
         setState({
@@ -83,13 +121,15 @@ export default function Nova() {
     function handleSubmit(e: any) {
         e.preventDefault();
 
+
         console.log("Tentando salvar os resultados: ");
         console.log(state);
-
         putFiscalizacao(state);
         //zerando o state novamente
         setState(estadoInicial);
         setAtualizar(!atualizar);
+
+
     }
 
     const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
@@ -118,33 +158,21 @@ export default function Nova() {
                 {resultados.map(x => (
                     <Card sx={{m: 1}} variant="elevation">
                         <CardContent>
+                            <Box sx={{display: 'flex', alignItems: 'center', justifyContent:'space-between'}}>
+                                <Typography variant="h6">Permissão {x.prefixo}</Typography>
+                                <Typography variant="subtitle1" className="label">{x.horario}</Typography>
+                            </Box>
+                            <Box sx={{display: 'flex', justifyContent:'space-between'}}>
+                                <Typography className="detalhe">{x.placa} </Typography>
 
-
-                            <Grid container sx={{textAlign: 'left'}}>
-                                <Grid xs={4}><span className="label">Ponto:</span><span
-                                    className="dados">{x.ponto}</span></Grid>
-                                <Grid xs={4}><span className="label">Placa:</span><span
-                                    className="dados">{x.placa}</span></Grid>
-                                <Grid xs={4}><span className="label">Selo:</span><span
-                                    className="dados">{x.selo}</span></Grid>
-                                <Grid xs={12} sx={{mt:1}}><span className="label ">Perm.:</span><span
-                                    className="dados">{x.nomePermissionario}</span></Grid>
-                                <Grid xs={6}><span className="label detalhe">Cotax: </span><span
-                                    className="dados detalhe">{x.cotaxPermissionario}</span></Grid>
-                                <Grid xs={6}><span className="label detalhe">Vencimento: </span><span
-                                    className="dados detalhe">{x.vencimentoPermissionario}</span></Grid>
                                 {
-                                    x.nomeCondutor == "" ? <>
-                                        </> :
-                                        <>
-                                            <Grid xs={12} sx={{mt:1}}><span className="label">Cond.: </span><span
-                                                className="dados">{x.nomeCondutor}</span></Grid>
-                                            <Grid xs={6}><span className="label detalhe">Cotax: </span><span
-                                                className="dados detalhe">{x.cotaxCondutor}</span></Grid>
-                                            <Grid xs={6}><span className="label detalhe">Vencimento: </span><span
-                                                className="dados detalhe">{x.vencimentoCondutor}</span></Grid></>
+                                    x.status == "Liberado" ?
+                                    <Typography className="coisaBoa">{x.status}</Typography> :
+                                        <Typography className="coisaRuim">{x.status}</Typography>
                                 }
-                            </Grid>
+
+
+                            </Box>
 
 
                         </CardContent>
@@ -336,6 +364,25 @@ export default function Nova() {
 
 
                                     </Grid>
+
+
+                                    <Grid xs={12}>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="statusLabel">Status</InputLabel>
+                                            <Select
+                                                labelId="statusLabel"
+                                                value={state.status}
+                                                id="status"
+                                                onChange={handleSelectChange}
+                                            >
+                                                <MenuItem value={"Liberado"}>Liberado</MenuItem>
+                                                <MenuItem value={"Liberado e autuado"}>Liberado e autuado</MenuItem>
+                                                <MenuItem value={"Afastado"}>Afastado</MenuItem>
+                                                <MenuItem value={"Afastado e autuado"}>Afastado e autuado</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+
 
                                     <Grid xs={12} sx={{mt: 2, p: 1}} className="papel">
                                         Observações

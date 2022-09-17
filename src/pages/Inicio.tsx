@@ -24,7 +24,7 @@ export default function Inicio(){
 
 
                     <Typography
-                        variant="h5"
+                        fontSize="large"
                         align="center"
                         color="text.secondary"
                         paragraph

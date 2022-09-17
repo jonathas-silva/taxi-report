@@ -11,9 +11,7 @@ paper da MUI*/
 }
 
 .label{
-    font-weight: lighter;
-    font-size: 0.85em;
-    color: darkslategray;
+    color: dimgray;
 }
 
 .dados{
@@ -23,4 +21,12 @@ paper da MUI*/
 .detalhe{
     color: darkgray;
     font-weight: lighter;
+}
+
+.coisaBoa{
+    color: blue;
+}
+
+.coisaRuim{
+    color: red;
 }

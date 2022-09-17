@@ -11,5 +11,7 @@ export type fiscalizado = {
     nomeCondutor: string,
     cotaxCondutor: number,
     vencimentoCondutor: string,
-    observacoes: string;
+    status: string,
+    observacoes?: string,
+    horario: string
 }
