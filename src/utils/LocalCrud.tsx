@@ -33,5 +33,13 @@ export function putFiscalizacao(fiscalizacao: fiscalizado){
     resultadoLista.push(fiscalizacao);
 
     postFiscalizacao(resultadoLista);
+}
 
+export function deletarEntrada(index: number){
+    console.log("   Chegamos até o deletarEntrada(). Index = " + index);
+    let resultadoLista: fiscalizado[] = getFiscalizacao();
+
+    resultadoLista.splice(index,1);
+
+    postFiscalizacao(resultadoLista);
 }

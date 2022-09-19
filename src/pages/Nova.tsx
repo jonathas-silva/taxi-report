@@ -35,7 +35,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import {fiscalizado} from "../assets/Tipos";
 import {recuperar, salvar} from "../utils/FirebaseCrud";
 import DocumentData from "firebase/compat";
-import {getFiscalizacao, putFiscalizacao} from "../utils/LocalCrud";
+import {getFiscalizacao, deletarEntrada, putFiscalizacao} from "../utils/LocalCrud";
 import {ExpandMore} from "@mui/icons-material";
 
 
@@ -61,7 +61,73 @@ export default function Nova() {
         horario: ""
     }
 
+
+    const [atualizar, setAtualizar] = useState(false);
+    const [resultados, setResultados] = useState<fiscalizado[]>([]);
+    const [state, setState] = useState<fiscalizado>(estadoInicial);
+    const [status, setStatus] = useState<string>('');
     const [open, setOpen] = useState(false);
+    const [expandedId, setExpandedId] = React.useState(-1);
+    const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
+    function switchHandle(e: any) {
+        setcondutorIgualPerm((e as any).target.checked); //vai retornar um false or true
+    }
+
+
+    //use effect controlado pelo estado de 'atualizar'. Ou seja, quando fechar o modal, o programa renderiza
+    useEffect(() => {
+        setResultados(getFiscalizacao());
+    }, [atualizar])
+
+
+    const handleClose = () => {
+        setOpen(false);
+        setAtualizar(!atualizar)
+    };
+
+    function handleDelete(index: number) {
+        console.log("chegamos até o handle delete! Index = " + index);
+        deletarEntrada(index);
+        setAtualizar(!atualizar);
+    }
+
+    function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void {
+        e.preventDefault();
+        const value = e.target.value;
+        setState({
+            ...state,
+            [(e as any).target.id]: value
+        });
+    }
+
+    //Aqui eu criei um evento só para lidar com o select, devido a tipagem
+    //gerar alguns erros em tempo de execução
+    const handleSelectChange = (event: SelectChangeEvent) => {
+        const value = event.target.value;
+        setState({
+            ...state,
+            status: value
+        });
+    };
+
+    function handleSubmit(e: any) {
+        e.preventDefault();
+
+
+        console.log("Tentando salvar os resultados: ");
+        console.log(state);
+        putFiscalizacao(state);
+        //zerando o state novamente
+        setState(estadoInicial);
+        setAtualizar(!atualizar);
+
+
+    }
+
+    const handleExpandClick = (i: number) => {
+        setExpandedId(expandedId === i ? -1 : i);
+    };
+
     const handleClickOpen = () => {
 
 
@@ -87,69 +153,9 @@ export default function Nova() {
 
         setOpen(true)
     };
-    const handleClose = () => {
-        setOpen(false);
-        setAtualizar(!atualizar)
-    };
 
-    const [atualizar, setAtualizar] = useState(false);
-    const [resultados, setResultados] = useState<fiscalizado[]>([]);
-    const [state, setState] = useState<fiscalizado>(estadoInicial);
-
-    const [status, setStatus] = useState<string>('');
-
-    //use effect controlado pelo estado de 'atualizar'. Ou seja, quando fechar o modal, o programa renderiza
-    useEffect(() => {
-        setResultados(getFiscalizacao());
-    }, [atualizar])
-
-    //Aqui eu criei um evento só para lidar com o select, devido a tipagem
-    //gerar alguns erros em tempo de execução
-    const handleSelectChange = (event: SelectChangeEvent) => {
-        const value = event.target.value;
-        setState({
-            ...state,
-            status: value
-        });
-    };
-
-    function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void {
-        e.preventDefault();
-        const value = e.target.value;
-        setState({
-            ...state,
-            [(e as any).target.id]: value
-        });
-    }
-
-    function handleSubmit(e: any) {
-        e.preventDefault();
-
-
-        console.log("Tentando salvar os resultados: ");
-        console.log(state);
-        putFiscalizacao(state);
-        //zerando o state novamente
-        setState(estadoInicial);
-        setAtualizar(!atualizar);
-
-
-    }
-
-    const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
-    function switchHandle(e: any) {
-        setcondutorIgualPerm((e as any).target.checked); //vai retornar um false or true
-    }
 
     let navigate = useNavigate();
-
-
-    const [expandedId, setExpandedId] = React.useState(-1);
-
-    const handleExpandClick = (i: number) => {
-        setExpandedId(expandedId === i ? -1 : i);
-    };
-
     return (
         <div>
             <AppBar position="relative" color="primary" sx={{display: 'flex', alignItems: 'center'}}>
@@ -169,7 +175,7 @@ export default function Nova() {
                     <Card sx={{m: 1}} variant="elevation" key={index}>
                         <CardHeader sx={{textAlign: 'left'}}
                                     action={
-                                        <IconButton>
+                                        <IconButton onClick={() => handleDelete(index)}>
                                             <Icon color="warning">delete</Icon>
                                         </IconButton>
                                     }
@@ -217,13 +223,13 @@ export default function Nova() {
                                     {
                                         x.nomeCondutor == "" ?
                                             <Grid xs={8} className="dados">O mesmo</Grid> :
-                                        <>
-                                        <Grid xs={8} className="dados"> {x.nomeCondutor}</Grid>
-                                        <Grid xs={4} className="label">Cotax cond.</Grid>
-                                        <Grid xs={8} className="dados"> {x.cotaxCondutor}</Grid>
-                                        <Grid xs={4} className="label">Validade cond.</Grid>
-                                        <Grid xs={8} className="dados"> {x.vencimentoCondutor}</Grid>
-                                        </>
+                                            <>
+                                                <Grid xs={8} className="dados"> {x.nomeCondutor}</Grid>
+                                                <Grid xs={4} className="label">Cotax cond.</Grid>
+                                                <Grid xs={8} className="dados"> {x.cotaxCondutor}</Grid>
+                                                <Grid xs={4} className="label">Validade cond.</Grid>
+                                                <Grid xs={8} className="dados"> {x.vencimentoCondutor}</Grid>
+                                            </>
                                     }
                                 </Grid>
 
