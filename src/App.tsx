@@ -5,28 +5,29 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import Nova from './pages/Nova';
-import { Route, Routes } from 'react-router-dom';
+import {Route, Routes} from 'react-router-dom';
 import {Box, ThemeProvider} from '@mui/material';
 import {theme} from "./assets/Themes";
+import Database from "./pages/Database";
 
 
 function App() {
 
-  return (
-    <ThemeProvider theme={theme}>
-      <Box className="App" sx={{
-        backgroundColor: 'background.paper'
-      }}>
-        <Routes>
+    return (
+        <ThemeProvider theme={theme}>
+            <Box className="App" sx={{
+                backgroundColor: 'background.paper'
+            }}>
+                <Routes>
 
-          <Route path='/' element={ <Inicio/>} />
-          <Route path='/nova' element={ <Nova/>} />
+                    <Route path='/' element={<Inicio/>}/>
+                    <Route path='/nova' element={<Nova/>}/>
+                    <Route path='/dashboard' element={<Database/>}/>
+                </Routes>
 
-        </Routes>
-
-      </Box>
-    </ThemeProvider>
-  )
+            </Box>
+        </ThemeProvider>
+    )
 }
 
 export default App

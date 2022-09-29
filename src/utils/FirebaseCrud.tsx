@@ -1,6 +1,7 @@
 //imports do firebase
 import {initializeApp} from 'firebase/app';
 import {addDoc, collection, Firestore, getDocs, getFirestore} from "firebase/firestore";
+import {fiscalizacaoFechada} from "../assets/Tipos";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAqhkxkgulL8T0fh_2Aau9iNIJOyMUHfvM",
@@ -16,12 +17,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-//SET
-async function putFiscalizacao(data: any) {
+//PUT
+async function putFiscalizacao(data: fiscalizacaoFechada) {
     addDoc(collection(db, "/fiscalizacao"), data);
 }
 
-export function salvar(dados: any) {
+export function salvar(dados: fiscalizacaoFechada) {
     putFiscalizacao(dados).then(
         response => {
             console.log('Dados salvos com sucesso!');

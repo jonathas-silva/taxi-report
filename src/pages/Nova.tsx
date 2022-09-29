@@ -32,7 +32,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import React, {useEffect, useState} from "react";
 import Grid from '@mui/material/Unstable_Grid2';
-import {fiscalizado} from "../assets/Tipos";
+import {fiscalizacaoFechada, fiscalizado} from "../assets/Tipos";
 import {recuperar, salvar} from "../utils/FirebaseCrud";
 import DocumentData from "firebase/compat";
 import {getFiscalizacao, deletarEntrada, putFiscalizacao} from "../utils/LocalCrud";
@@ -82,6 +82,7 @@ export default function Nova() {
     const [state, setState] = useState<fiscalizado>(estadoInicial);
     const [status, setStatus] = useState<string>('');
     const [open, setOpen] = useState(false);
+    const [dialogSalvar, setDialogSalvar] = useState(false);
     const [expandedId, setExpandedId] = React.useState(-1);
     const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
     function switchHandle(e: any) {
@@ -131,12 +132,12 @@ export default function Nova() {
         //"validação" das propriedades obrigatórias
         if (
 
-                    state.cotaxPermissionario == estadoInicial.cotaxPermissionario ||
-                    state.ponto == estadoInicial.ponto ||
-                    state.selo == estadoInicial.selo ||
-                    state.prefixo == estadoInicial.prefixo ||
-                    state.placa == estadoInicial.placa ||
-                    state.vencimentoPermissionario == estadoInicial.vencimentoPermissionario
+            state.cotaxPermissionario == estadoInicial.cotaxPermissionario ||
+            state.ponto == estadoInicial.ponto ||
+            state.selo == estadoInicial.selo ||
+            state.prefixo == estadoInicial.prefixo ||
+            state.placa == estadoInicial.placa ||
+            state.vencimentoPermissionario == estadoInicial.vencimentoPermissionario
 
         ) {
             console.log("formulário vazio. Nada será registrado")
@@ -150,6 +151,24 @@ export default function Nova() {
             setAtualizar(!atualizar);
         }
 
+    }
+
+    function handleSalvar(e: any) {
+        e.preventDefault();
+        let nome = (e as any).target.nome.value;
+        let matricula = (e as any).target.matricula.value;
+
+        if(nome=="" || matricula == ""){
+            console.log("nenhuma entrada")
+        }else {
+            let novaFiscalizacao: fiscalizacaoFechada = {
+                nome: nome,
+                matricula: matricula,
+                fiscalizados: resultados
+            }
+            console.log("Tentando salvar na nuvem...");
+            salvar(novaFiscalizacao);
+        }
     }
 
     const handleExpandClick = (i: number) => {
@@ -184,13 +203,17 @@ export default function Nova() {
     let navigate = useNavigate();
     return (
         <div>
-            <AppBar position="relative" color="primary" sx={{display: 'flex', alignItems: 'center'}}>
-                <Toolbar>
-                    <IconButton onClick={() => navigate('/')}><Icon className="botao"
-                                                                    fontSize="medium">arrow_back</Icon></IconButton>
-                    <Typography component={"span"} variant="h5" align="center">
-                        Fiscalização de Taxi
-                    </Typography>
+            <AppBar position="relative" color="primary" >
+                <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
+                    <IconButton onClick={() => navigate('/')}>
+                        <Icon className="botao" fontSize="medium">arrow_back</Icon>
+                    </IconButton>
+                    {/*<Typography component={"span"} variant="h5" align="center">*/}
+                    {/*    Fiscalização de Taxi*/}
+                    {/*</Typography>*/}
+                    <IconButton onClick={() => setDialogSalvar(true)}>
+                        <Icon className="botao" fontSize="medium">menu</Icon>
+                    </IconButton>
                 </Toolbar>
             </AppBar>
             <Box sx={{
@@ -210,10 +233,6 @@ export default function Nova() {
                         >
                         </CardHeader>
                         <CardContent>
-                            {/*               <Box sx={{display: 'flex', alignItems: 'center', justifyContent:'space-between'}}>
-                                <Typography variant="h6">Permissão {x.prefixo}</Typography>
-                                <Typography variant="subtitle1" className="label">{x.horario}</Typography>
-                            </Box>*/}
                             <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                                 <Typography className="detalhe">{x.horario} </Typography>
 
@@ -279,6 +298,31 @@ export default function Nova() {
                     >
                         Clique no ícone acima para adicionar uma nova entrada:
                     </Typography>
+
+
+                    <Dialog open={dialogSalvar} onClose={() => setDialogSalvar(false)}>
+                        <DialogTitle>Salvar fiscalização</DialogTitle>
+                        <DialogContent>
+                            <form id="salvarFiscalizacao" onSubmit={handleSalvar}>
+                                <TextField
+                                    sx={{mb: 2}}
+                                    fullWidth
+                                    id="nome"
+                                    placeholder="Nome do Agente"
+                                >
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    id="matricula"
+                                    type="number"
+                                    placeholder="Matrícula do Agente"
+                                >
+                                </TextField>
+                                <Button type="submit" onClick={() => setDialogSalvar(false)}>Salvar</Button>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+
 
 
                     <Dialog open={open} onClose={() => handleClose()}>

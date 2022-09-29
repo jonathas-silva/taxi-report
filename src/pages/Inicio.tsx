@@ -41,6 +41,7 @@ export default function Inicio(){
                     </Stack>
                     <Stack>
                         <Button variant="outlined"
+                                onClick={()=>navigate('/dashboard')}
                         >Banco de Dados</Button>
                     </Stack>
                 </Container>

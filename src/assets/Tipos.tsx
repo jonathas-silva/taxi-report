@@ -15,3 +15,9 @@ export type fiscalizado = {
     observacoes?: string,
     horario: string
 }
+
+export type fiscalizacaoFechada = {
+    nome: string;
+    matricula: number;
+    fiscalizados: fiscalizado[];
+}
