@@ -161,10 +161,15 @@ export default function Nova() {
         if(nome=="" || matricula == ""){
             console.log("nenhuma entrada")
         }else {
+            let data = new Date();
+
+            const horarioFormatado: string = data.toLocaleString('pt-BR', dataEHoraBrasileira);
+
             let novaFiscalizacao: fiscalizacaoFechada = {
                 nome: nome,
                 matricula: matricula,
-                fiscalizados: resultados
+                fiscalizados: resultados,
+                data: horarioFormatado
             }
             console.log("Tentando salvar na nuvem...");
             salvar(novaFiscalizacao);
@@ -208,9 +213,9 @@ export default function Nova() {
                     <IconButton onClick={() => navigate('/')}>
                         <Icon className="botao" fontSize="medium">arrow_back</Icon>
                     </IconButton>
-                    {/*<Typography component={"span"} variant="h5" align="center">*/}
-                    {/*    Fiscalização de Taxi*/}
-                    {/*</Typography>*/}
+                    <Typography component={"span"} variant="h5" align="center">
+                        Fiscalização de Taxi
+                    </Typography>
                     <IconButton onClick={() => setDialogSalvar(true)}>
                         <Icon className="botao" fontSize="medium">menu</Icon>
                     </IconButton>
@@ -221,7 +226,7 @@ export default function Nova() {
             }}>
 
                 {resultados.map((x, index) => (
-                    <Card sx={{m: 1}} variant="elevation" key={index}>
+                    <Card sx={{m: 1, bgcolor: "white"}} variant="elevation" key={index}>
                         <CardHeader sx={{textAlign: 'left'}}
                                     action={
                                         <IconButton onClick={() => handleDelete(index)}>

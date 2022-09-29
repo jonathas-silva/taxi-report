@@ -20,4 +20,5 @@ export type fiscalizacaoFechada = {
     nome: string;
     matricula: number;
     fiscalizados: fiscalizado[];
+    data: string;
 }
