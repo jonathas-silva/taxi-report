@@ -2,14 +2,14 @@
 //tipo que contém os dados colhidos na fiscalização
 export type fiscalizado = {
     nomePermissionario: string,
-    cotaxPermissionario: number,
+    cotaxPermissionario: number | undefined,
     vencimentoPermissionario: string,
     nomeCondutor: string,
-    cotaxCondutor: number,
+    cotaxCondutor: number | undefined,
     vencimentoCondutor: string,
-    ponto: number,
+    ponto: number | undefined,
     selo: string,
-    prefixo: number,
+    prefixo: number | undefined,
     placa: string,
     status: string,
     observacoes?: string,

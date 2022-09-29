@@ -61,6 +61,21 @@ export default function Nova() {
         horario: ""
     }
 
+    //Aqui estamos formatando a data e hora para o formato brasileiro, e eliminando os segundos
+    const dataEHoraBrasileira: Intl.DateTimeFormatOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    }
+
+    const dataBrasileira: Intl.DateTimeFormatOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+    }
+
 
     const [atualizar, setAtualizar] = useState(false);
     const [resultados, setResultados] = useState<fiscalizado[]>([]);
@@ -113,14 +128,27 @@ export default function Nova() {
     function handleSubmit(e: any) {
         e.preventDefault();
 
+        //"validação" das propriedades obrigatórias
+        if (
 
-        console.log("Tentando salvar os resultados: ");
-        console.log(state);
-        putFiscalizacao(state);
-        //zerando o state novamente
-        setState(estadoInicial);
-        setAtualizar(!atualizar);
+                    state.cotaxPermissionario == estadoInicial.cotaxPermissionario ||
+                    state.ponto == estadoInicial.ponto ||
+                    state.selo == estadoInicial.selo ||
+                    state.prefixo == estadoInicial.prefixo ||
+                    state.placa == estadoInicial.placa ||
+                    state.vencimentoPermissionario == estadoInicial.vencimentoPermissionario
 
+        ) {
+            console.log("formulário vazio. Nada será registrado")
+        } else {
+
+            console.log("Tentando salvar os resultados: ");
+            console.log(state);
+            putFiscalizacao(state);
+            //zerando o state novamente
+            setState(estadoInicial);
+            setAtualizar(!atualizar);
+        }
 
     }
 
@@ -135,16 +163,7 @@ export default function Nova() {
 
         let data = new Date();
 
-        //Aqui estamos formatando a data e hora para o formato brasileiro, e eliminando os segundos
-        const opcoes: Intl.DateTimeFormatOptions = {
-            day: '2-digit',
-            month: '2-digit',
-            year: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        }
-
-        const horarioFormatado: string = data.toLocaleString('pt-BR', opcoes);
+        const horarioFormatado: string = data.toLocaleString('pt-BR', dataEHoraBrasileira);
 
         setState({
             ...state,
@@ -153,6 +172,13 @@ export default function Nova() {
 
         setOpen(true)
     };
+
+    function formatadorDeData(data: string): string {
+        let newData = new Date(data);
+        let dataFormatada = newData.toLocaleString('pt-BR', dataBrasileira);
+
+        return dataFormatada;
+    }
 
 
     let navigate = useNavigate();
@@ -211,11 +237,11 @@ export default function Nova() {
                                     <Grid xs={4} className="label">Cotax</Grid>
                                     <Grid xs={8} className="dados">{x.cotaxPermissionario}</Grid>
                                     <Grid xs={4} className="label">Válidade</Grid>
-                                    <Grid xs={8} className="dados">{x.vencimentoPermissionario}</Grid>
+                                    <Grid xs={8} className="dados">{formatadorDeData(x.vencimentoPermissionario)}</Grid>
                                     <Grid xs={4} className="label">Placa</Grid>
                                     <Grid xs={8} className="dados">{x.placa}</Grid>
                                     <Grid xs={4} className="label">Selo</Grid>
-                                    <Grid xs={8} className="dados">{x.vencimentoCondutor}</Grid>
+                                    <Grid xs={8} className="dados">{formatadorDeData(x.selo)}</Grid>
                                     <Grid xs={4} className="label">Ponto</Grid>
                                     <Grid xs={8} className="dados">{x.ponto}</Grid>
                                     <Grid xs={4} className="label">Cond.</Grid>
@@ -270,6 +296,7 @@ export default function Nova() {
                                             <Grid xs={12} sm={6}>
                                                 <TextField
                                                     fullWidth
+                                                    required
                                                     id="prefixo"
                                                     variant="standard"
                                                     label="prefixo"
@@ -427,7 +454,7 @@ export default function Nova() {
 
                                     <Grid xs={12}>
                                         <FormControl fullWidth>
-                                            <InputLabel id="statusLabel">Status</InputLabel>
+
                                             <Select
                                                 labelId="statusLabel"
                                                 value={state.status}
