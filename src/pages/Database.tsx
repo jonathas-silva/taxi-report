@@ -10,7 +10,7 @@ import {
     TableCell,
     TableBody,
     TableContainer,
-    AppBar, Toolbar, Typography, IconButton, Dialog, TextField, Collapse, Box
+    AppBar, Toolbar, Typography, IconButton, Dialog, TextField, Collapse, Box, Snackbar
 } from "@mui/material";
 import React, {useState} from "react";
 import {recuperar} from "../utils/FirebaseCrud";
@@ -37,6 +37,8 @@ export default function Database() {
 
     const [expandedId, setExpandedId] = React.useState(-1);
 
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+
     const handleClick = () => {
         recuperar().then(resultados => {
             setResultados(resultados);
@@ -47,6 +49,33 @@ export default function Database() {
     const handleExpandClick = (i: number) => {
         setExpandedId(expandedId === i ? -1 : i);
     };
+
+    function criarCsv(resultado: fiscalizacaoFechada){
+
+        let fiscalizacaoConvertida: string = "";
+
+        //entradas comuns para cada fiscalização
+        let nome: string = resultado.nome;
+        let matricula: string = resultado.matricula.toString();
+        let data:string = resultado.data;
+
+        //agora vamos criar as linhas do csv no formato:
+        /*
+            Nome, Matrícula, data, ponto, prefixo, placa, selo, cotax Permissionário,
+            validade Cotax Permissionário, cotax condutor, validade cotax condutor,
+            status e observações.
+        */
+        resultado.fiscalizados.forEach(x=>{
+            fiscalizacaoConvertida += `${nome};${matricula};${data};${x.ponto};${x.prefixo};${x.placa};${x.selo};${x.cotaxPermissionario};${x.vencimentoPermissionario};${x.cotaxCondutor};${x.vencimentoCondutor};${x.status};${x.observacoes}\n`
+        })
+
+        navigator.clipboard.writeText(fiscalizacaoConvertida).then(
+            response => {
+                setOpenSnackbar(true);
+            }
+        )
+    }
+
 
 
     let navigate = useNavigate();
@@ -75,6 +104,7 @@ export default function Database() {
                             <TableRow>
                                 <TableCell align="center">Agente</TableCell>
                                 <TableCell align="center">Data e Hora</TableCell>
+                                <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -82,19 +112,24 @@ export default function Database() {
                             resultados?.map((resultado, index) =>
 
                                     <TableBody key={index}>
-                                        <TableRow onClick={() => handleExpandClick(index)} hover>
-                                            <TableCell align="center">{resultado.nome}</TableCell>
-                                            <TableCell align="center">{resultado.data}</TableCell>
+                                        <TableRow hover>
+                                            <TableCell align="center" onClick={() => handleExpandClick(index)}>{resultado.nome}</TableCell>
+                                            <TableCell align="center" onClick={() => handleExpandClick(index)}>{resultado.data} </TableCell>
+                                            <TableCell align="left"  sx={{width:300}}><IconButton onClick={()=>criarCsv(resultado)}><Icon color="primary" className="botao" fontSize="medium">backup_table</Icon>
+                                            </IconButton></TableCell>
                                         </TableRow>
-                                        <TableRow>
-                                            <TableCell align="center" style={{ padding: 0, border: 0 }} colSpan={2}>
+                                        <TableRow >
+                                            <TableCell align="center" style={{ padding: 0, border: 0 }} colSpan={3}>
                                                 <Collapse in={expandedId === index}>
                                                     <Table
                                                         sx={{
-                                                        bgcolor: 'lightblue',
+                                                        bgcolor: '#E0F7FA',
                                                         width:'100%'
                                                     }}>
-                                                        <TableHead>
+                                                        <TableHead sx={{
+                                                            bgcolor: '#B2EBF2',
+                                                            width:'100%'
+                                                        }}>
                                                             <TableRow>
                                                                 <TableCell align="center">Ponto</TableCell>
                                                                 <TableCell align="center">Permissão</TableCell>
@@ -105,8 +140,8 @@ export default function Database() {
                                                         <TableBody>
 
                                                                 {
-                                                                    resultado.fiscalizados.map(taxi=>
-                                                                        <TableRow>
+                                                                    resultado.fiscalizados.map((taxi, index)=>
+                                                                        <TableRow key={index}>
                                                                             <TableCell align="center">{taxi.ponto}</TableCell>
                                                                             <TableCell align="center">{taxi.prefixo}</TableCell>
                                                                             <TableCell align="center">{taxi.cotaxPermissionario}</TableCell>
@@ -136,13 +171,20 @@ export default function Database() {
                 <DialogContent>
                     {
                         resultadosAtivos?.fiscalizados.map(
-                            x => (
+                            (x) => (
                                 <li>{x.nomePermissionario}</li>
                             )
                         )
                     }
                 </DialogContent>
             </Dialog>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={4000}
+                onClose={()=> setOpenSnackbar(false)}
+                message="Conteúdo CSV copiado para a área de transferência"
+            />
 
         </div>
 
