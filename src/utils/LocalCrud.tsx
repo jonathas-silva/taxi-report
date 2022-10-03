@@ -43,3 +43,7 @@ export function deletarEntrada(index: number){
 
     postFiscalizacao(resultadoLista);
 }
+
+export function limpar(){
+    localStorage.removeItem("resultados");
+}

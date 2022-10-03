@@ -37,7 +37,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import {fiscalizacaoFechada, fiscalizado} from "../assets/Tipos";
 import {db, putFiscalizacaoNuvem, recuperar, salvar} from "../utils/FirebaseCrud";
 import DocumentData from "firebase/compat";
-import {getFiscalizacao, deletarEntrada, putFiscalizacao} from "../utils/LocalCrud";
+import {getFiscalizacao, deletarEntrada, putFiscalizacao, limpar} from "../utils/LocalCrud";
 import {ExpandMore} from "@mui/icons-material";
 import {addDoc, collection} from "firebase/firestore";
 
@@ -89,6 +89,7 @@ export default function Nova() {
     const [state, setState] = useState<fiscalizado>(estadoInicial);
     const [status, setStatus] = useState<string>('');
     const [open, setOpen] = useState(false);
+    const [openDialogLimpar, setOpenDialogLimpar] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
     const [dialogSalvar, setDialogSalvar] = useState(false);
     const [expandedId, setExpandedId] = React.useState(-1);
@@ -167,6 +168,13 @@ export default function Nova() {
 
     }
 
+    const handleLimpar = () => {
+        setOpenMenu(false);
+        setOpenDialogLimpar(true);
+        limpar();
+        setAtualizar(!atualizar);
+    }
+
     function handleSalvar(e: any) {
         setOpenMenu(false);
         e.preventDefault();
@@ -188,10 +196,16 @@ export default function Nova() {
             }
             console.log("Tentando salvar na nuvem...");
 
-            //Foi a função diretamente aqui, ao invés da função do CRUD, para conseguirmos utilizar o delay do assync para conseguir o efeito do delay até a inserção do DATABASE
-            addDoc(collection(db, "/fisalizacao"), novaFiscalizacao).then(response=>{
+            //Foi a função diretamente aqui, ao invés da função do CRUD, para conseguirmos utilizar o
+            //delay do assync para conseguir o efeito do delay até a inserção do DATABASE
+            //Para uma futura implementação de um banco de dados relacional + API, se atentar ao tratamento de erros!!
+            addDoc(collection(db, "/fiscalizacao"), novaFiscalizacao).then(response => {
                 setOpenSnackbarSucessoUpload(true);
-            }).catch(error=>{
+                //    Se a fiscalização foi salva com sucesso, então a tela é seguramente limpa
+                limpar();
+                setAtualizar(!atualizar);
+
+            }).catch(error => {
                 setOpenSnackbarErroUpload(true);
             })
 
@@ -238,7 +252,7 @@ export default function Nova() {
                     <Typography component={"span"} variant="h5" align="center">
                         Fiscalização de Taxi
                     </Typography>
-                    <IconButton onClick={() => setOpenMenu(true)} id="botao-de-menu" >
+                    <IconButton onClick={() => setOpenMenu(true)} id="botao-de-menu">
                         <Icon className="botao" fontSize="medium">menu</Icon>
                     </IconButton>
 
@@ -248,11 +262,12 @@ export default function Nova() {
             <Menu
                 anchorEl={document.getElementById('botao-de-menu')}
                 open={openMenu}
-                onClose={()=>setOpenMenu(false)}
+                onClose={() => setOpenMenu(false)}
 
             >
-                <MenuItem onClick={handleDialogSalvar}><ListItemIcon><Icon>cloud_upload</Icon></ListItemIcon>Enviar relatório</MenuItem>
-                <MenuItem><ListItemIcon><Icon>clear</Icon></ListItemIcon>Limpar</MenuItem>
+                <MenuItem onClick={handleDialogSalvar}><ListItemIcon><Icon>cloud_upload</Icon></ListItemIcon>Enviar
+                    relatório</MenuItem>
+                <MenuItem onClick={handleLimpar}><ListItemIcon><Icon>clear</Icon></ListItemIcon>Limpar</MenuItem>
 
             </Menu>
 
@@ -265,7 +280,7 @@ export default function Nova() {
                         <CardHeader sx={{textAlign: 'left'}}
                                     action={
                                         <IconButton onClick={() => handleDelete(index)}>
-                                            <Icon color="warning">delete</Icon>
+                                            <Icon>delete</Icon>
                                         </IconButton>
                                     }
                                     title={`Permissão ${x.prefixo}`}
@@ -587,18 +602,37 @@ export default function Nova() {
 
                 </Container>
             </Box>
+
+
+            {/*DIALOG PARA DELEÇÃO DE ENTRADAS*/}
+            <Dialog
+                open={openDialogLimpar}
+                onClose={() => setOpenDialogLimpar(false)}
+            >
+                <DialogTitle>
+                    Limpar Fiscalização
+                </DialogTitle>
+                <DialogContent>
+                    Isto limpará todo o conteúdo da fiscalização. Tem certeza que deseja continuar?
+                </DialogContent>
+                <DialogActions>
+                    <Button>Continuar</Button>
+                    <Button onClick={() => setOpenDialogLimpar(false)}>Cancelar</Button>
+                </DialogActions>
+            </Dialog>
+
             {/*SNACKBARS*/}
 
             <Snackbar
                 open={openSnackbarSucessoUpload}
                 autoHideDuration={3000}
-                onClose={()=> setOpenSnackbarSucessoUpload(false)}
+                onClose={() => setOpenSnackbarSucessoUpload(false)}
                 message="Fiscalização salva com sucesso na nuvem!"
             />
             <Snackbar
                 open={openSnackbarErroUpload}
                 autoHideDuration={3000}
-                onClose={()=> setOpenSnackbarSucessoUpload(false)}
+                onClose={() => setOpenSnackbarErroUpload(false)}
                 message="Houve algum erro na sincronização do dispositivo com a nuvem..."
             />
 
