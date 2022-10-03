@@ -2,6 +2,8 @@
 import {initializeApp} from 'firebase/app';
 import {addDoc, collection, Firestore, getDocs, getFirestore} from "firebase/firestore";
 import {fiscalizacaoFechada} from "../assets/Tipos";
+import {Snackbar} from "@mui/material";
+import React, { useState } from "react";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAqhkxkgulL8T0fh_2Aau9iNIJOyMUHfvM",
@@ -14,23 +16,23 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+export const db = getFirestore(app);
 
 
 //PUT
-async function putFiscalizacao(data: fiscalizacaoFechada) {
+export async function putFiscalizacaoNuvem(data: fiscalizacaoFechada) {
     addDoc(collection(db, "/fiscalizacao"), data);
 }
 
 export function salvar(dados: fiscalizacaoFechada) {
-    putFiscalizacao(dados).then(
+    putFiscalizacaoNuvem(dados).then(
         response => {
-            console.log('Dados salvos com sucesso!');
+            console.log("ok");
         }
     ).catch(error => {
-        console.log('Algum erro ocorreu. Segue: ');
         console.log(error);
     })
+
 }
 
 //GET
