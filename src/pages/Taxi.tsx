@@ -51,14 +51,14 @@ export default function Taxi() {
 
     const estadoInicial: TaxiFiscalizado = {
         nomePermissionario: "",
-        cotaxPermissionario: 0,
-        ponto: 0,
+        cotaxPermissionario: "",
+        ponto: "",
         selo: "",
-        prefixo: 0,
+        prefixo: "",
         placa: "",
         vencimentoPermissionario: "",
         nomeCondutor: "",
-        cotaxCondutor: 0,
+        cotaxCondutor: "",
         vencimentoCondutor: "",
         observacoes: "",
         status: "Liberado",
@@ -401,7 +401,6 @@ export default function Taxi() {
                                             <Grid xs={12} sm={6}>
                                                 <TextField
                                                     fullWidth
-                                                    required
                                                     id="prefixo"
                                                     variant="standard"
                                                     label="prefixo"
@@ -417,7 +416,8 @@ export default function Taxi() {
                                                     id="placa"
                                                     variant="standard"
                                                     label="Placa"
-                                                    value={state.placa}
+                                                    value={state.placa.toUpperCase()}
+                                                    // inputProps={{pattern: '[A - Z0 - 9]'}}
                                                     onChange={handleChange}
                                                 >
 

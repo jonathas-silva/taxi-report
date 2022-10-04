@@ -71,7 +71,7 @@ export default function Database() {
 
             /*Se o cotax do condutor for igual a 0, significa que o condutor e permissionário são o mesmo.
             * Neste caso, é inserido apenas um traço indicando que não há esse dado*/
-            if (x.cotaxCondutor == 0){
+            if (x.cotaxCondutor == ""){
                 fiscalizacaoConvertida += `- ; -;`
             } else{
                 fiscalizacaoConvertida += `${x.cotaxCondutor};${x.vencimentoCondutor};`;
