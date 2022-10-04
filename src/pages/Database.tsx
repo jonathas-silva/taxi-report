@@ -66,7 +66,18 @@ export default function Database() {
             status e observações.
         */
         resultado.fiscalizados.forEach(x=>{
-            fiscalizacaoConvertida += `${nome};${matricula};${data};${x.ponto};${x.prefixo};${x.placa};${x.selo};${x.cotaxPermissionario};${x.vencimentoPermissionario};${x.cotaxCondutor};${x.vencimentoCondutor};${x.status};${x.numeroDocumento};${x.observacoes}\n`
+            fiscalizacaoConvertida += `${nome};${matricula};${data};${x.ponto};${x.prefixo};${x.placa};`;
+            fiscalizacaoConvertida += `${x.selo};${x.cotaxPermissionario};${x.vencimentoPermissionario};`;
+
+            /*Se o cotax do condutor for igual a 0, significa que o condutor e permissionário são o mesmo.
+            * Neste caso, é inserido apenas um traço indicando que não há esse dado*/
+            if (x.cotaxCondutor == 0){
+                fiscalizacaoConvertida += `- ; -;`
+            } else{
+                fiscalizacaoConvertida += `${x.cotaxCondutor};${x.vencimentoCondutor};`;
+            }
+
+            fiscalizacaoConvertida += `${x.status};${x.numeroDocumento || '-'};${x.observacoes || '-'}\n`
         })
 
         navigator.clipboard.writeText(fiscalizacaoConvertida).then(
