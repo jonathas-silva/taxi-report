@@ -1,7 +1,7 @@
 import {AppBar, Box, Button, Container, Stack, Toolbar, Typography} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-export default function Inicio(){
+export default function Menu(){
 
     let navigate = useNavigate();
 
@@ -11,7 +11,7 @@ export default function Inicio(){
             <AppBar position="relative" sx={{display: 'flex', alignItems: 'center'}}>
                 <Toolbar >
                     <Typography variant="h5" align="center" >
-                        Fiscalização de Taxi
+                        RDF Eletrônico
                     </Typography>
                 </Toolbar>
             </AppBar>
@@ -29,7 +29,7 @@ export default function Inicio(){
                         color="text.secondary"
                         paragraph
                     >
-                        Selecione abaixo o que deseja fazer:
+                        Selecione abaixo a modalidade que deseja fiscalizar:
                     </Typography>
                     <Stack>
                         <Button
@@ -37,7 +37,7 @@ export default function Inicio(){
                             sx={{mt:4, mb:1}}
                             onClick={()=>navigate('/nova')}
                             
-                        >Nova Fiscalização</Button>
+                        >Táxi</Button>
                     </Stack>
                     <Stack>
                         <Button variant="outlined"

@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import Icon from '@mui/material/Icon'
 import {theme} from "../assets/Themes";
-import './Nova.css';
+import './Taxi.css';
 import {useNavigate} from "react-router-dom";
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -34,21 +34,22 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import React, {useEffect, useState} from "react";
 import Grid from '@mui/material/Unstable_Grid2';
-import {fiscalizacaoFechada, fiscalizado} from "../assets/Tipos";
+import {fiscalizacaoFechada, TaxiFiscalizado} from "../assets/Tipos";
 import {db, putFiscalizacaoNuvem, recuperar, salvar} from "../utils/FirebaseCrud";
 import DocumentData from "firebase/compat";
 import {getFiscalizacao, deletarEntrada, putFiscalizacao, limpar} from "../utils/LocalCrud";
 import {ExpandMore} from "@mui/icons-material";
 import {addDoc, collection} from "firebase/firestore";
+import Escolar from "./Escolar";
 
 
-export default function Nova() {
+export default function Taxi() {
 
 
 //Aqui vamos fazer algo muito importante: usar um único onChance para controlar o form todo
 //Primeiro setamos o objeto do formulário
 
-    const estadoInicial: fiscalizado = {
+    const estadoInicial: TaxiFiscalizado = {
         nomePermissionario: "",
         cotaxPermissionario: 0,
         ponto: 0,
@@ -61,6 +62,7 @@ export default function Nova() {
         vencimentoCondutor: "",
         observacoes: "",
         status: "Liberado",
+        numeroDocumento: "",
         horario: ""
     }
 
@@ -85,8 +87,8 @@ export default function Nova() {
     const [openSnackbarSucessoUpload, setOpenSnackbarSucessoUpload] = useState(false);
     const [openSnackbarErroUpload, setOpenSnackbarErroUpload] = useState(false);
 
-    const [resultados, setResultados] = useState<fiscalizado[]>([]);
-    const [state, setState] = useState<fiscalizado>(estadoInicial);
+    const [resultados, setResultados] = useState<TaxiFiscalizado[]>([]);
+    const [state, setState] = useState<TaxiFiscalizado>(estadoInicial);
     const [status, setStatus] = useState<string>('');
     const [open, setOpen] = useState(false);
     const [openDialogLimpar, setOpenDialogLimpar] = useState(false);
@@ -566,6 +568,25 @@ export default function Nova() {
                                             </Select>
                                         </FormControl>
                                     </Grid>
+
+                                    {
+                                        state.status == 'Liberado' ? <></> :
+                                            <Grid xs={12}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="numeroDocumento"
+                                                    variant="standard"
+                                                    value={state.numeroDocumento}
+                                                    onChange={handleChange}
+                                                    label="Nº documento"
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                >
+
+                                                </TextField>
+                                            </Grid>
+                                    }
 
 
                                     <Grid xs={12} sx={{mt: 2, p: 1}} className="papel">

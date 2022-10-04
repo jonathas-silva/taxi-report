@@ -66,7 +66,7 @@ export default function Database() {
             status e observações.
         */
         resultado.fiscalizados.forEach(x=>{
-            fiscalizacaoConvertida += `${nome};${matricula};${data};${x.ponto};${x.prefixo};${x.placa};${x.selo};${x.cotaxPermissionario};${x.vencimentoPermissionario};${x.cotaxCondutor};${x.vencimentoCondutor};${x.status};${x.observacoes}\n`
+            fiscalizacaoConvertida += `${nome};${matricula};${data};${x.ponto};${x.prefixo};${x.placa};${x.selo};${x.cotaxPermissionario};${x.vencimentoPermissionario};${x.cotaxCondutor};${x.vencimentoCondutor};${x.status};${x.numeroDocumento};${x.observacoes}\n`
         })
 
         navigator.clipboard.writeText(fiscalizacaoConvertida).then(
@@ -115,7 +115,7 @@ export default function Database() {
                                         <TableRow hover>
                                             <TableCell align="center" onClick={() => handleExpandClick(index)}>{resultado.nome}</TableCell>
                                             <TableCell align="center" onClick={() => handleExpandClick(index)}>{resultado.data} </TableCell>
-                                            <TableCell align="left"  sx={{width:300}}><IconButton onClick={()=>criarCsv(resultado)}><Icon color="primary" className="botao" fontSize="medium">backup_table</Icon>
+                                            <TableCell align="center" ><IconButton onClick={()=>criarCsv(resultado)}><Icon color="primary" className="botao" fontSize="medium">backup_table</Icon>
                                             </IconButton></TableCell>
                                         </TableRow>
                                         <TableRow >

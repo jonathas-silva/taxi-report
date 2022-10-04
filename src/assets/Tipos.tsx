@@ -1,6 +1,6 @@
 
 //tipo que contém os dados colhidos na fiscalização
-export type fiscalizado = {
+export type TaxiFiscalizado = {
     nomePermissionario: string,
     cotaxPermissionario: number | undefined,
     vencimentoPermissionario: string,
@@ -12,6 +12,7 @@ export type fiscalizado = {
     prefixo: number | undefined,
     placa: string,
     status: string,
+    numeroDocumento?: string,
     observacoes?: string,
     horario: string
 }
@@ -19,6 +20,6 @@ export type fiscalizado = {
 export type fiscalizacaoFechada = {
     nome: string;
     matricula: number;
-    fiscalizados: fiscalizado[];
+    fiscalizados: TaxiFiscalizado[];
     data: string;
 }

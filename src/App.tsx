@@ -1,14 +1,15 @@
 import './App.css'
-import Inicio from './pages/Inicio'
+import Menu from './pages/Menu'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import Nova from './pages/Nova';
+import Taxi from './pages/Taxi';
 import {Route, Routes} from 'react-router-dom';
 import {Box, ThemeProvider} from '@mui/material';
 import {theme} from "./assets/Themes";
 import Database from "./pages/Database";
+import Escolar from "./pages/Escolar";
 
 
 function App() {
@@ -20,8 +21,8 @@ function App() {
             }}>
                 <Routes>
 
-                    <Route path='/' element={<Inicio/>}/>
-                    <Route path='/nova' element={<Nova/>}/>
+                    <Route path='/' element={<Menu/>}/>
+                    <Route path='/nova' element={<Taxi/>}/>
                     <Route path='/dashboard' element={<Database/>}/>
                 </Routes>
 

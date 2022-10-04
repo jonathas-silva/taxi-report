@@ -1,20 +1,20 @@
 /*Funções para abstrair o processo de CRUD das informações do formulário para o localStorage*/
-/*Armazenado em 'resultados' um lista do tipo fiscalizado[]*/
+/*Armazenado em 'resultados' um lista do tipo TaxiFiscalizado[]*/
 
-import {fiscalizado} from "../assets/Tipos";
+import {TaxiFiscalizado} from "../assets/Tipos";
 
 
 
 //UTILS
-function postFiscalizacao(fiscalizacao: fiscalizado[]){
+function postFiscalizacao(fiscalizacao: TaxiFiscalizado[]){
     localStorage.setItem("resultados", JSON.stringify(fiscalizacao));
 }
 
 //GET
 //Retorna uma lista armazenada em 'resultados' em localStorage
 //se não houver uma lista em 'resultados', retorna uma lista vazia
-export function getFiscalizacao():fiscalizado[]{
-    let resultadoLista: fiscalizado[] = new Array;
+export function getFiscalizacao():TaxiFiscalizado[]{
+    let resultadoLista: TaxiFiscalizado[] = new Array;
 
    //hasOwnProperty nos informa se há essa lista no localStorage ou ainda não
     if(localStorage.hasOwnProperty("resultados")){
@@ -27,8 +27,8 @@ export function getFiscalizacao():fiscalizado[]{
 
 /*Recupera a lista da fiscalização em local storage,
 * insere uma nova entrada nessa lista e salva novamente*/
-export function putFiscalizacao(fiscalizacao: fiscalizado){
-    let resultadoLista: fiscalizado[] = getFiscalizacao();
+export function putFiscalizacao(fiscalizacao: TaxiFiscalizado){
+    let resultadoLista: TaxiFiscalizado[] = getFiscalizacao();
 
     resultadoLista.push(fiscalizacao);
 
@@ -37,7 +37,7 @@ export function putFiscalizacao(fiscalizacao: fiscalizado){
 
 export function deletarEntrada(index: number){
     console.log("   Chegamos até o deletarEntrada(). Index = " + index);
-    let resultadoLista: fiscalizado[] = getFiscalizacao();
+    let resultadoLista: TaxiFiscalizado[] = getFiscalizacao();
 
     resultadoLista.splice(index,1);
 
