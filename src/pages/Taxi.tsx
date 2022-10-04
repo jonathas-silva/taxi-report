@@ -170,11 +170,16 @@ export default function Taxi() {
 
     }
 
-    const handleLimpar = () => {
+    const handleLimparPrompt = () => {
         setOpenMenu(false);
         setOpenDialogLimpar(true);
+
+    }
+
+    const handleLimparAccept = () => {
         limpar();
         setAtualizar(!atualizar);
+        setOpenDialogLimpar(false);
     }
 
     function handleSalvar(e: any) {
@@ -269,7 +274,7 @@ export default function Taxi() {
             >
                 <MenuItem onClick={handleDialogSalvar}><ListItemIcon><Icon>cloud_upload</Icon></ListItemIcon>Enviar
                     relatório</MenuItem>
-                <MenuItem onClick={handleLimpar}><ListItemIcon><Icon>clear</Icon></ListItemIcon>Limpar</MenuItem>
+                <MenuItem onClick={handleLimparPrompt}><ListItemIcon><Icon>clear</Icon></ListItemIcon>Limpar</MenuItem>
 
             </Menu>
 
@@ -637,7 +642,7 @@ export default function Taxi() {
                     Isto limpará todo o conteúdo da fiscalização. Tem certeza que deseja continuar?
                 </DialogContent>
                 <DialogActions>
-                    <Button>Continuar</Button>
+                    <Button onClick={handleLimparAccept}>Continuar</Button>
                     <Button onClick={() => setOpenDialogLimpar(false)}>Cancelar</Button>
                 </DialogActions>
             </Dialog>
