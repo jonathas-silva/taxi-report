@@ -12,6 +12,7 @@ import {
     Divider,
     FormControl,
     FormControlLabel,
+    FormGroup,
     IconButton,
     ListItemIcon,
     Menu,
@@ -34,31 +35,40 @@ import React, {useEffect, useState} from "react";
 import Grid from '@mui/material/Unstable_Grid2';
 import {fiscalizacaoFechada, TaxiFiscalizado} from "../assets/TiposTaxi";
 import {db} from "../utils/FirebaseCrud";
-import {deletarEntradaTaxi, getFiscalizacaoTaxi, limparTaxi, putFiscalizacaoTaxi} from "../utils/LocalCrud";
+import {
+    deletarEntradaAplicativo,
+    deletarEntradaTaxi,
+    getFiscalizacaoAplicativo,
+    getFiscalizacaoTaxi, limparAplicativo,
+    limparTaxi, putFiscalizacaoAplicativo,
+    putFiscalizacaoTaxi
+} from "../utils/LocalCrud";
 import {addDoc, collection} from "firebase/firestore";
+import {aplicativoFiscalizado, fiscalizacaoFechadaApp} from "../assets/TiposAplicativo";
+import {CheckBox} from "@mui/icons-material";
 
 
-export default function Taxi() {
+export default function Aplicativo() {
 
 
 //Aqui vamos fazer algo muito importante: usar um único onChance para controlar o form todo
 //Primeiro setamos o objeto do formulário
 
-    const estadoInicial: TaxiFiscalizado = {
-        nomePermissionario: "",
-        cotaxPermissionario: "",
-        ponto: "",
-        selo: "",
-        prefixo: "",
+    const estadoInicial: aplicativoFiscalizado = {
+        nome: "",
+        local: "",
+        horario: "",
+        aplicativo: "Uber",
         placa: "",
-        vencimentoPermissionario: "",
-        nomeCondutor: "",
-        cotaxCondutor: "",
-        vencimentoCondutor: "",
-        observacoes: "",
+        modelo: "",
+        cor: "",
+        letraCnh: "B",
+        ear: "Sim",
+        qrCode: "Sim",
         status: "Liberado",
-        numeroDocumento: "",
-        horario: ""
+        observacoes: "",
+        aitp: "",
+        trav: ""
     }
 
     //Aqui estamos formatando a data e hora para o formato brasileiro, e eliminando os segundos
@@ -82,8 +92,8 @@ export default function Taxi() {
     const [openSnackbarSucessoUpload, setOpenSnackbarSucessoUpload] = useState(false);
     const [openSnackbarErroUpload, setOpenSnackbarErroUpload] = useState(false);
 
-    const [resultados, setResultados] = useState<TaxiFiscalizado[]>([]);
-    const [state, setState] = useState<TaxiFiscalizado>(estadoInicial);
+    const [resultados, setResultados] = useState<aplicativoFiscalizado[]>([]);
+    const [state, setState] = useState<aplicativoFiscalizado>(estadoInicial);
     const [status, setStatus] = useState<string>('');
     const [open, setOpen] = useState(false);
     const [openDialogLimpar, setOpenDialogLimpar] = useState(false);
@@ -98,7 +108,7 @@ export default function Taxi() {
 
     //use effect controlado pelo estado de 'atualizar'. Ou seja, quando fechar o modal, o programa renderiza
     useEffect(() => {
-        setResultados(getFiscalizacaoTaxi());
+        setResultados(getFiscalizacaoAplicativo());
     }, [atualizar])
 
 
@@ -115,53 +125,32 @@ export default function Taxi() {
 
     function handleDelete(index: number) {
         console.log("chegamos até o handle delete! Index = " + index);
-        deletarEntradaTaxi(index);
+        deletarEntradaAplicativo(index);
         setAtualizar(!atualizar);
     }
 
-    function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void {
+
+    /*Em comparação com a página 'Táxi', foi feito um teste de mudança do controle do estado
+    * do componente de e.target.id para e.target.name, porque aparentemente os componentes
+    * do tipo select não são acessados dessa forma pelo id, mas pelo nome sim*/
+    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         e.preventDefault();
         const value = e.target.value;
         setState({
             ...state,
-            [(e as any).target.id]: value
+            [(e as any).target.name]: value
         });
     }
 
-    //Aqui eu criei um evento só para lidar com o select, devido a tipagem
-    //gerar alguns erros em tempo de execução
-    const handleSelectChange = (event: SelectChangeEvent) => {
-        const value = event.target.value;
-        setState({
-            ...state,
-            status: value
-        });
-    };
 
     function handleSubmit(e: any) {
         e.preventDefault();
 
-        //"validação" das propriedades obrigatórias
-        if (
-
-            state.cotaxPermissionario == estadoInicial.cotaxPermissionario ||
-            state.ponto == estadoInicial.ponto ||
-            state.selo == estadoInicial.selo ||
-            state.prefixo == estadoInicial.prefixo ||
-            state.placa == estadoInicial.placa ||
-            state.vencimentoPermissionario == estadoInicial.vencimentoPermissionario
-
-        ) {
-            console.log("formulário vazio. Nada será registrado")
-        } else {
-
-            console.log("Tentando salvar os resultados: ");
-            console.log(state);
-            putFiscalizacaoTaxi(state);
-            //zerando o state novamente
-            setState(estadoInicial);
-            setAtualizar(!atualizar);
-        }
+        //zerando o estado
+        putFiscalizacaoAplicativo(state);
+        setState(estadoInicial);
+        setAtualizar(!atualizar);
+        console.log(state);
 
     }
 
@@ -172,7 +161,7 @@ export default function Taxi() {
     }
 
     const handleLimparAccept = () => {
-        limparTaxi();
+        limparAplicativo();
         setAtualizar(!atualizar);
         setOpenDialogLimpar(false);
     }
@@ -190,7 +179,7 @@ export default function Taxi() {
 
             const horarioFormatado: string = data.toLocaleString('pt-BR', dataEHoraBrasileira);
 
-            let novaFiscalizacao: fiscalizacaoFechada = {
+            let novaFiscalizacao: fiscalizacaoFechadaApp = {
                 nome: nome,
                 matricula: matricula,
                 fiscalizados: resultados,
@@ -201,10 +190,10 @@ export default function Taxi() {
             //Foi a função diretamente aqui, ao invés da função do CRUD, para conseguirmos utilizar o
             //delay do assync para conseguir o efeito do delay até a inserção do DATABASE
             //Para uma futura implementação de um banco de dados relacional + API, se atentar ao tratamento de erros!!
-            addDoc(collection(db, "/fiscalizacao"), novaFiscalizacao).then(response => {
+            addDoc(collection(db, "/transAplicativo"), novaFiscalizacao).then(response => {
                 setOpenSnackbarSucessoUpload(true);
                 //    Se a fiscalização foi salva com sucesso, então a tela é seguramente limpa
-                limparTaxi();
+                limparAplicativo();
                 setAtualizar(!atualizar);
 
             }).catch(error => {
@@ -232,6 +221,8 @@ export default function Taxi() {
             horario: horarioFormatado
         });
 
+        console.log(state);
+
         setOpen(true)
     };
 
@@ -252,7 +243,7 @@ export default function Taxi() {
                         <Icon className="botao" fontSize="medium">arrow_back</Icon>
                     </IconButton>
                     <Typography component={"span"} variant="h5" align="center">
-                        Fiscalização de Taxi
+                        Transporte por Aplicativo
                     </Typography>
                     <IconButton onClick={() => setOpenMenu(true)} id="botao-de-menu">
                         <Icon className="botao" fontSize="medium">menu</Icon>
@@ -285,8 +276,8 @@ export default function Taxi() {
                                             <Icon>delete</Icon>
                                         </IconButton>
                                     }
-                                    title={`Permissão ${x.prefixo}`}
-                                    subheader={x.nomePermissionario}
+                                    title={`Placa ${x.placa}`}
+                                    subheader={x.nome}
                         >
                         </CardHeader>
                         <CardContent>
@@ -301,42 +292,6 @@ export default function Taxi() {
 
                             </Box>
                         </CardContent>
-                        <CardActions disableSpacing>
-
-                            <IconButton onClick={() => handleExpandClick(index)}><Icon>expand_more</Icon></IconButton>
-
-                        </CardActions>
-                        <Collapse in={expandedId === index} timeout="auto" unmountOnExit>
-                            <CardContent>
-
-                                <Grid container className="infoAdicionais">
-                                    <Grid xs={4} className="label">Cotax</Grid>
-                                    <Grid xs={8} className="dados">{x.cotaxPermissionario}</Grid>
-                                    <Grid xs={4} className="label">Válidade</Grid>
-                                    <Grid xs={8} className="dados">{formatadorDeData(x.vencimentoPermissionario)}</Grid>
-                                    <Grid xs={4} className="label">Placa</Grid>
-                                    <Grid xs={8} className="dados">{x.placa}</Grid>
-                                    <Grid xs={4} className="label">Selo</Grid>
-                                    <Grid xs={8} className="dados">{formatadorDeData(x.selo)}</Grid>
-                                    <Grid xs={4} className="label">Ponto</Grid>
-                                    <Grid xs={8} className="dados">{x.ponto}</Grid>
-                                    <Grid xs={4} className="label">Cond.</Grid>
-
-                                    {
-                                        x.nomeCondutor == "" ?
-                                            <Grid xs={8} className="dados">O mesmo</Grid> :
-                                            <>
-                                                <Grid xs={8} className="dados"> {x.nomeCondutor}</Grid>
-                                                <Grid xs={4} className="label">Cotax cond.</Grid>
-                                                <Grid xs={8} className="dados"> {x.cotaxCondutor}</Grid>
-                                                <Grid xs={4} className="label">Validade cond.</Grid>
-                                                <Grid xs={8} className="dados"> {x.vencimentoCondutor}</Grid>
-                                            </>
-                                    }
-                                </Grid>
-
-                            </CardContent>
-                        </Collapse>
                     </Card>
                 ))}
 
@@ -390,29 +345,113 @@ export default function Taxi() {
                             <form id="fiscalizacaoForm" onSubmit={handleSubmit}>
                                 <Grid container spacing={1}>
 
+                                    <Grid xs={12} sx={{mb: 2}}>
+                                        <TextField
+                                            fullWidth
+                                            name="local"
+                                            variant="standard"
+                                            label="Endereço"
+                                            value={state.local}
+                                            onChange={handleChange}
+                                        />
+                                    </Grid>
+
+
+                                    Condutor
+                                    <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>
+
+                                        <Grid container>
+                                            <Grid xs={12} sm={12}>
+                                                <TextField
+                                                    fullWidth
+                                                    name="nome"
+                                                    variant="standard"
+                                                    label="Nome"
+                                                    value={state.nome}
+                                                    onChange={handleChange}
+
+                                                />
+                                            </Grid>
+
+                                            <Grid xs={12} sm={4}>
+                                                <TextField
+                                                    fullWidth
+                                                    name="letraCnh"
+                                                    variant="standard"
+                                                    label="Categoria CNH"
+                                                    type="number"
+                                                    select
+                                                    value={state.letraCnh}
+                                                    onChange={handleChange}
+
+                                                >
+                                                    <MenuItem value={"B"}>B</MenuItem>
+                                                    <MenuItem value={"AB"}>AB</MenuItem>
+                                                    <MenuItem value={"AC"}>AC</MenuItem>
+                                                    <MenuItem value={"AD"}>AD</MenuItem>
+                                                    <MenuItem value={"AE"}>AE</MenuItem>
+                                                    <MenuItem value={"C"}>C</MenuItem>
+                                                    <MenuItem value={"D"}>D</MenuItem>
+                                                    <MenuItem value={"E"}>E</MenuItem>
+
+
+                                                </TextField>
+                                            </Grid>
+                                            <Grid xs={12} sm={4}>
+                                                <TextField
+                                                    fullWidth
+                                                    name="aplicativo"
+                                                    variant="standard"
+                                                    label="Aplicativo"
+                                                    type="number"
+                                                    select
+                                                    value={state.aplicativo}
+                                                    onChange={handleChange}
+
+                                                >
+                                                    <MenuItem value={"Uber"}>Uber</MenuItem>
+                                                    <MenuItem value={"99"}>99 Táxi</MenuItem>
+                                                    <MenuItem value={"Cabify"}>Cabify</MenuItem>
+                                                    <MenuItem value={"InDriver"}>InDriver</MenuItem>
+
+
+
+                                                </TextField>
+                                            </Grid>
+                                            <Grid xs={12} sm={4}>
+                                                <TextField
+                                                    fullWidth
+                                                    name="ear"
+                                                    variant="standard"
+                                                    label="Exerce ativ. remunerada?"
+                                                    type="number"
+                                                    select
+                                                    value={state.ear}
+                                                    onChange={handleChange}
+
+                                                >
+                                                    <MenuItem value="Sim">Sim</MenuItem>
+                                                    <MenuItem value="Não">Não</MenuItem>
+
+                                                </TextField>
+                                            </Grid>
+
+                                        </Grid>
+
+                                    </Grid>
+
                                     Veículo
                                     <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>
                                         <Grid container>
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="prefixo"
-                                                    variant="standard"
-                                                    label="prefixo"
-                                                    type="number"
-                                                    value={state.prefixo}
-                                                    onChange={handleChange}
-                                                />
-                                            </Grid>
+
 
                                             <Grid xs={12} sm={6}>
                                                 <TextField
                                                     fullWidth
-                                                    id="placa"
+                                                    name="placa"
                                                     variant="standard"
                                                     label="Placa"
                                                     value={state.placa.toUpperCase()}
-                                                    // inputProps={{pattern: '[A - Z0 - 9]'}}
                                                     onChange={handleChange}
                                                 >
 
@@ -422,170 +461,98 @@ export default function Taxi() {
                                             <Grid xs={12} sm={6}>
                                                 <TextField
                                                     fullWidth
-                                                    id="selo"
+                                                    name="modelo"
                                                     variant="standard"
-                                                    label="Validade selo"
-                                                    type="date"
-                                                    value={state.selo}
+                                                    label="Marca/ modelo"
+                                                    value={state.modelo}
                                                     onChange={handleChange}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
+                                                />
+                                            </Grid>
+
+
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    name="cor"
+                                                    variant="standard"
+                                                    label="Cor"
+                                                    value={state.cor}
+                                                    onChange={handleChange}
                                                 />
                                             </Grid>
 
                                             <Grid xs={12} sm={6}>
                                                 <TextField
                                                     fullWidth
-                                                    id="ponto"
+                                                    name="qrCode"
                                                     variant="standard"
-                                                    value={state.ponto}
+                                                    label="Possui QRCODE?"
+                                                    select
+                                                    value={state.qrCode}
                                                     onChange={handleChange}
-                                                    label="ponto"
-                                                    type="number"
-                                                />
+                                                >
+                                                    <MenuItem value={"Sim"}>Sim</MenuItem>
+                                                    <MenuItem value={"Não"}>Não</MenuItem>
+
+                                                </TextField>
                                             </Grid>
                                         </Grid>
-
-                                    </Grid>
-
-                                    Permissionário
-                                    <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>
-
-                                        <Grid container>
-                                            <Grid xs={12} sm={12}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="nomePermissionario"
-                                                    variant="standard"
-                                                    label="Nome"
-                                                    value={state.nomePermissionario}
-                                                    onChange={handleChange}
-                                                />
-                                            </Grid>
-
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="cotaxPermissionario"
-                                                    variant="standard"
-                                                    label="Cotax"
-                                                    type="number"
-                                                    value={state.cotaxPermissionario}
-                                                    onChange={handleChange}
-                                                />
-                                            </Grid>
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="vencimentoPermissionario"
-                                                    variant="standard"
-                                                    value={state.vencimentoPermissionario}
-                                                    onChange={handleChange}
-                                                    label="validade"
-                                                    type="date"
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                />
-                                            </Grid>
-
-                                        </Grid>
-
-                                    </Grid>
-
-                                    Condutor
-                                    <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>
-
-
-                                        <FormControlLabel
-                                            control={
-                                                <Switch defaultChecked={true}
-                                                        onChange={switchHandle}/>
-                                            }
-                                            label="Condutor e permissionário são a mesma pessoa"
-                                        />
-                                        <Grid container>
-                                            <Grid xs={12} sm={12}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="nomeCondutor"
-                                                    disabled={condutorIgualPerm}
-                                                    value={condutorIgualPerm ? state.nomePermissionario : state.nomeCondutor}
-                                                    onChange={handleChange}
-                                                    variant="standard"
-                                                    label="Nome"
-                                                />
-                                            </Grid>
-
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="cotaxCondutor"
-                                                    value={condutorIgualPerm ? state.cotaxPermissionario : state.cotaxCondutor}
-                                                    disabled={condutorIgualPerm}
-                                                    onChange={handleChange}
-                                                    variant="standard"
-                                                    label="Cotax"
-                                                    type="number"
-                                                />
-                                            </Grid>
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="vencimentoCondutor"
-                                                    disabled={condutorIgualPerm}
-                                                    variant="standard"
-                                                    value={condutorIgualPerm ? state.vencimentoPermissionario : state.vencimentoCondutor}
-                                                    onChange={handleChange}
-                                                    label="validade"
-                                                    type="date"
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                />
-                                            </Grid>
-
-                                        </Grid>
-
 
                                     </Grid>
 
 
                                     <Grid xs={12}>
-                                        <FormControl fullWidth>
+                                        <TextField
+                                            name="status"
+                                            fullWidth
+                                            select
+                                            value={state.status}
+                                            onChange={handleChange}
+                                        >
+                                            <MenuItem value={"Liberado"}>Liberado</MenuItem>
+                                            <MenuItem value={"Autuado"}>Autuado</MenuItem>
+                                            <MenuItem value={"Autuado e removido"}>Autuado e Removido</MenuItem>
+                                        </TextField>
 
-                                            <Select
-                                                labelId="statusLabel"
-                                                value={state.status}
-                                                id="status"
-                                                onChange={handleSelectChange}
-                                            >
-                                                <MenuItem value={"Liberado"}>Liberado</MenuItem>
-                                                <MenuItem value={"Liberado e autuado"}>Liberado e autuado</MenuItem>
-                                                <MenuItem value={"Afastado"}>Afastado</MenuItem>
-                                                <MenuItem value={"Afastado e autuado"}>Afastado e autuado</MenuItem>
-                                            </Select>
-                                        </FormControl>
                                     </Grid>
 
                                     {
-                                        state.status == 'Liberado' ? <></> :
-                                            <Grid xs={12}>
+                                        state.status != 'Liberado' ?
+                                            <Grid xs={12} sm={6}>
                                                 <TextField
                                                     fullWidth
-                                                    id="numeroDocumento"
+                                                    name="aitp"
                                                     variant="standard"
-                                                    value={state.numeroDocumento}
+                                                    value={state.aitp}
                                                     onChange={handleChange}
-                                                    label="Nº documento"
+                                                    label="Nº do AITP"
                                                     InputLabelProps={{
                                                         shrink: true,
                                                     }}
                                                 >
 
                                                 </TextField>
-                                            </Grid>
+                                            </Grid> : <></>
+                                    }
+
+                                    {
+                                        state.status == 'Autuado e removido' ?
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    name="trav"
+                                                    variant="standard"
+                                                    value={state.trav}
+                                                    onChange={handleChange}
+                                                    label="Nº do TRAV"
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                >
+
+                                                </TextField>
+                                            </Grid> : <></>
+
                                     }
 
 
@@ -594,11 +561,11 @@ export default function Taxi() {
 
                                         <TextField
                                             fullWidth={true}
-                                            id="observacoes"
+                                            name="observacoes"
                                             variant="standard"
                                             value={state.observacoes}
                                             onChange={handleChange}
-                                            placeholder="Autuações, notificações ou qualquer outra observação sobre esta fiscalização"
+                                            placeholder="Autuações adicionais e ocorrências sobre esta fiscalização"
                                             multiline
                                             rows={5}
                                         />

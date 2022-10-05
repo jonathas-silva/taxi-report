@@ -9,7 +9,7 @@ import {Route, Routes} from 'react-router-dom';
 import {Box, ThemeProvider} from '@mui/material';
 import {theme} from "./assets/Themes";
 import Database from "./pages/Database";
-import Escolar from "./pages/Escolar";
+import Aplicativo from "./pages/Aplicativo";
 
 
 function App() {
@@ -22,8 +22,9 @@ function App() {
                 <Routes>
 
                     <Route path='/' element={<Menu/>}/>
-                    <Route path='/nova' element={<Taxi/>}/>
+                    <Route path='/taxi' element={<Taxi/>}/>
                     <Route path='/dashboard' element={<Database/>}/>
+                    <Route path='/aplicativo' element={<Aplicativo/>}/>
                 </Routes>
 
             </Box>

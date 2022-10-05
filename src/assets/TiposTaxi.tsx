@@ -1,4 +1,3 @@
-
 //tipo que contém os dados colhidos na fiscalização
 export type TaxiFiscalizado = {
     nomePermissionario: string,

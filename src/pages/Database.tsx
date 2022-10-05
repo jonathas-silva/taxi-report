@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import React, {useState} from "react";
 import {recuperar} from "../utils/FirebaseCrud";
-import {fiscalizacaoFechada} from "../assets/Tipos";
+import {fiscalizacaoFechada} from "../assets/TiposTaxi";
 import Icon from "@mui/material/Icon";
 import {useNavigate} from "react-router-dom";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -73,7 +73,7 @@ export default function Database() {
             * Neste caso, é inserido apenas um traço indicando que não há esse dado*/
             if (x.cotaxCondutor == ""){
                 fiscalizacaoConvertida += `- ; -;`
-            } else{
+            } else {
                 fiscalizacaoConvertida += `${x.cotaxCondutor};${x.vencimentoCondutor};`;
             }
 

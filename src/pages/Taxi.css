@@ -1,43 +1,43 @@
-.botao{
+.botao {
     color: white;
 }
 
 
 /*Uma formatação tipo paper, mais limpa e equilibrada do que o componente
 paper da MUI*/
-.papel{
+.papel {
     background-color: white;
     border-radius: 6px;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
 }
 
-.label{
+.label {
     font-size: medium;
     font-weight: lighter;
     color: lightslategray;
 }
 
-.dados{
+.dados {
     font-size: 1em;
     /*font-weight: bold;*/
     color: black;
     /*text-align: center;*/
 }
 
-.detalhe{
+.detalhe {
 
     color: darkgray;
 }
 
-.coisaBoa{
+.coisaBoa {
     color: blue;
 }
 
-.coisaRuim{
+.coisaRuim {
     color: red;
 }
 
-.infoAdicionais{
+.infoAdicionais {
     color: whitesmoke;
     text-align: left;
     /*border: 1px solid lightgray;*/

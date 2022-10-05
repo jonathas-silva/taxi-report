@@ -1,16 +1,16 @@
 import {AppBar, Box, Button, Container, Stack, Toolbar, Typography} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
-export default function Menu(){
+export default function Menu() {
 
     let navigate = useNavigate();
 
 
-    return(
+    return (
         <>
             <AppBar position="relative" sx={{display: 'flex', alignItems: 'center'}}>
-                <Toolbar >
-                    <Typography variant="h5" align="center" >
+                <Toolbar>
+                    <Typography variant="h5" align="center">
                         RDF Eletrônico
                     </Typography>
                 </Toolbar>
@@ -34,14 +34,14 @@ export default function Menu(){
                     <Stack>
                         <Button
                             variant="contained"
-                            sx={{mt:4, mb:1}}
-                            onClick={()=>navigate('/nova')}
-                            
+                            sx={{mt: 4, mb: 1}}
+                            onClick={() => navigate('/taxi')}
+
                         >Táxi</Button>
                     </Stack>
                     <Stack>
                         <Button variant="outlined"
-                                onClick={()=>navigate('/dashboard')}
+                                onClick={() => navigate('/dashboard')}
                         >Banco de Dados</Button>
                     </Stack>
                 </Container>

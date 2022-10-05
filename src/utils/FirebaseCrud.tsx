@@ -1,7 +1,7 @@
 //imports do firebase
 import {initializeApp} from 'firebase/app';
 import {addDoc, collection, Firestore, getDocs, getFirestore} from "firebase/firestore";
-import {fiscalizacaoFechada} from "../assets/Tipos";
+import {fiscalizacaoFechada} from "../assets/TiposTaxi";
 import {Snackbar} from "@mui/material";
 import React, { useState } from "react";
 
