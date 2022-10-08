@@ -166,6 +166,7 @@ export default function Taxi() {
             //zerando o state novamente
             setState(estadoInicial);
             setAtualizar(!atualizar);
+            setcondutorIgualPerm(true);
         }
 
     }
@@ -241,22 +242,26 @@ export default function Taxi() {
     };
 
     function formatadorDeData(data: string): string {
-        let params:string = `${data}T00:00:00`;
+        let params: string = `${data}T00:00:00`;
         let newData = new Date(params);
         let dataFormatada = newData.toLocaleString('pt-BR', dataBrasileira);
 
         return dataFormatada;
     }
 
-    function formatadordeSelo(data:string): string {
-        let params:string = `${data}T00:00:00`;
+    /*As data de vencimento de cotax são armazenadas no formato yyyy-mm-dd,
+    * ao passo que o vencimento do selo é armazenado no formato yyyy-mm, tanto no localStorage
+    * quanto no banco de dados, e são alteradas no momento da exibição. Portanto,
+    * para que todas as datas sejam exibidas corretamente, é feito um 'zeramento' do horário, para
+    * que não haja correção automática do GMT. É possível observar que a data e hora do relatório que consta
+    * no banco de dados não precisa passar por esse processo, por conta com a hora exata.*/
+    function formatadordeSelo(data: string): string {
+        let params: string = `${data}-01T00:00:00`;
         let newData = new Date(params);
         let dataFormatada = newData.toLocaleString('pt-BR', mesBrasileiro);
 
         return dataFormatada;
     }
-
-
 
 
     let navigate = useNavigate();
@@ -346,7 +351,8 @@ export default function Taxi() {
                                                 <Grid xs={4} className="label">Cotax cond.</Grid>
                                                 <Grid xs={8} className="dados"> {x.cotaxCondutor}</Grid>
                                                 <Grid xs={4} className="label">Validade cond.</Grid>
-                                                <Grid xs={8} className="dados"> {formatadorDeData(x.vencimentoCondutor)}</Grid>
+                                                <Grid xs={8}
+                                                      className="dados"> {formatadorDeData(x.vencimentoCondutor)}</Grid>
                                             </>
                                     }
                                 </Grid>
@@ -441,7 +447,7 @@ export default function Taxi() {
                                                     id="selo"
                                                     variant="standard"
                                                     label="Validade selo"
-                                                    type="date"
+                                                    type="month"
                                                     value={state.selo}
                                                     onChange={handleChange}
                                                     InputLabelProps={{
@@ -516,53 +522,53 @@ export default function Taxi() {
 
                                         <FormControlLabel
                                             control={
-                                                <Switch defaultChecked={true}
-                                                        onChange={switchHandle}/>
+                                                <Switch
+                                                    checked={condutorIgualPerm}
+                                                    onChange={switchHandle}/>
                                             }
                                             label="Condutor e permissionário são a mesma pessoa"
                                         />
-                                        <Grid container>
-                                            <Grid xs={12} sm={12}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="nomeCondutor"
-                                                    disabled={condutorIgualPerm}
-                                                    value={condutorIgualPerm ? state.nomePermissionario : state.nomeCondutor}
-                                                    onChange={handleChange}
-                                                    variant="standard"
-                                                    label="Nome"
-                                                />
-                                            </Grid>
+                                        {
+                                            condutorIgualPerm ? <div></div> :
+                                                <Grid container>
+                                                    <Grid xs={12} sm={12}>
+                                                        <TextField
+                                                            fullWidth
+                                                            id="nomeCondutor"
+                                                            value={condutorIgualPerm ? state.nomePermissionario : state.nomeCondutor}
+                                                            onChange={handleChange}
+                                                            variant="standard"
+                                                            label="Nome do condutor"
+                                                        />
+                                                    </Grid>
 
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="cotaxCondutor"
-                                                    value={condutorIgualPerm ? state.cotaxPermissionario : state.cotaxCondutor}
-                                                    disabled={condutorIgualPerm}
-                                                    onChange={handleChange}
-                                                    variant="standard"
-                                                    label="Cotax"
-                                                    type="number"
-                                                />
-                                            </Grid>
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="vencimentoCondutor"
-                                                    disabled={condutorIgualPerm}
-                                                    variant="standard"
-                                                    value={condutorIgualPerm ? state.vencimentoPermissionario : state.vencimentoCondutor}
-                                                    onChange={handleChange}
-                                                    label="validade"
-                                                    type="date"
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                />
-                                            </Grid>
+                                                    <Grid xs={12} sm={6}>
+                                                        <TextField
+                                                            fullWidth
+                                                            id="cotaxCondutor"
+                                                            value={condutorIgualPerm ? state.cotaxPermissionario : state.cotaxCondutor}
+                                                            onChange={handleChange}
+                                                            variant="standard"
+                                                            label="Cotax do condutor"
+                                                            type="number"
+                                                        />
+                                                    </Grid>
+                                                    <Grid xs={12} sm={6}>
+                                                        <TextField
+                                                            fullWidth
+                                                            id="vencimentoCondutor"
+                                                            variant="standard"
+                                                            value={condutorIgualPerm ? state.vencimentoPermissionario : state.vencimentoCondutor}
+                                                            onChange={handleChange}
+                                                            label="validade"
+                                                            type="date"
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                        />
+                                                    </Grid>
 
-                                        </Grid>
+                                                </Grid>}
 
 
                                     </Grid>
