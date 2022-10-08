@@ -76,6 +76,11 @@ export default function Taxi() {
         year: '2-digit'
     }
 
+    const mesBrasileiro: Intl.DateTimeFormatOptions = {
+        month: 'long',
+        year: 'numeric'
+    }
+
 
     const [atualizar, setAtualizar] = useState(false);
 
@@ -236,11 +241,22 @@ export default function Taxi() {
     };
 
     function formatadorDeData(data: string): string {
-        let newData = new Date(data);
+        let params:string = `${data}T00:00:00`;
+        let newData = new Date(params);
         let dataFormatada = newData.toLocaleString('pt-BR', dataBrasileira);
 
         return dataFormatada;
     }
+
+    function formatadordeSelo(data:string): string {
+        let params:string = `${data}T00:00:00`;
+        let newData = new Date(params);
+        let dataFormatada = newData.toLocaleString('pt-BR', mesBrasileiro);
+
+        return dataFormatada;
+    }
+
+
 
 
     let navigate = useNavigate();
@@ -317,7 +333,7 @@ export default function Taxi() {
                                     <Grid xs={4} className="label">Placa</Grid>
                                     <Grid xs={8} className="dados">{x.placa}</Grid>
                                     <Grid xs={4} className="label">Selo</Grid>
-                                    <Grid xs={8} className="dados">{formatadorDeData(x.selo)}</Grid>
+                                    <Grid xs={8} className="dados">{formatadordeSelo(x.selo)}</Grid>
                                     <Grid xs={4} className="label">Ponto</Grid>
                                     <Grid xs={8} className="dados">{x.ponto}</Grid>
                                     <Grid xs={4} className="label">Cond.</Grid>
@@ -330,7 +346,7 @@ export default function Taxi() {
                                                 <Grid xs={4} className="label">Cotax cond.</Grid>
                                                 <Grid xs={8} className="dados"> {x.cotaxCondutor}</Grid>
                                                 <Grid xs={4} className="label">Validade cond.</Grid>
-                                                <Grid xs={8} className="dados"> {x.vencimentoCondutor}</Grid>
+                                                <Grid xs={8} className="dados"> {formatadorDeData(x.vencimentoCondutor)}</Grid>
                                             </>
                                     }
                                 </Grid>
