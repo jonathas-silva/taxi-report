@@ -20,6 +20,12 @@ import {
     SelectChangeEvent,
     Snackbar,
     Switch,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     TextField,
     Toolbar,
     Typography
@@ -34,7 +40,13 @@ import React, {useEffect, useState} from "react";
 import Grid from '@mui/material/Unstable_Grid2';
 import {fiscalizacaoFechada, TaxiFiscalizado} from "../assets/TiposTaxi";
 import {db} from "../utils/FirebaseCrud";
-import {deletarEntradaTaxi, getFiscalizacaoTaxi, limparTaxi, putFiscalizacaoTaxi} from "../utils/LocalCrud";
+import {
+    atualizarFiscalizacaoTaxi,
+    deletarEntradaTaxi,
+    getFiscalizacaoTaxi,
+    limparTaxi,
+    putFiscalizacaoTaxi
+} from "../utils/LocalCrud";
 import {addDoc, collection} from "firebase/firestore";
 
 
@@ -93,6 +105,8 @@ export default function Taxi() {
     const [open, setOpen] = useState(false);
     const [openDialogLimpar, setOpenDialogLimpar] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
+    const [editando, setEditando] = useState({estado: false, indice:- 1});
+
     const [dialogSalvar, setDialogSalvar] = useState(false);
     const [expandedId, setExpandedId] = React.useState(-1);
     const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
@@ -122,6 +136,43 @@ export default function Taxi() {
         console.log("chegamos até o handle delete! Index = " + index);
         deletarEntradaTaxi(index);
         setAtualizar(!atualizar);
+    }
+
+    const handleEdit = (indice: number) => {
+
+        //aqui estamos mudando o estado do formulário para 'editando'.
+        setEditando({estado: true, indice: indice});
+
+        console.log(`Para o índice ${indice} temos: `);
+        console.log(resultados[indice]);
+
+        setState(resultados[indice]);
+
+        if(resultados[indice].nomeCondutor == ""){
+            setcondutorIgualPerm(true);
+        } else {
+            setcondutorIgualPerm(false);
+        }
+
+
+        /*Por abrir o Dialog sem passar pelo HandleClickOpen, eu pulo a etapa de atribuição da data e hora.
+        * Isso garante que a hora da fiscalização vai ser sempre a hora que o agente clicou no botão, evitando
+        * problemas de inconsistência de horário.*/
+        setOpen(true);
+
+    }
+
+    const handleEditSubmit = (e: any) => {
+        e.preventDefault();
+        atualizarFiscalizacaoTaxi(state, editando.indice);
+        setOpen(false);
+        setState(estadoInicial);
+        setAtualizar(!atualizar);
+        setcondutorIgualPerm(true);
+        setEditando({estado: false, indice: -1});
+
+
+
     }
 
     function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void {
@@ -295,7 +346,9 @@ export default function Taxi() {
             </Menu>
 
             <Box sx={{
-                pt: 4
+                pt: 4,
+                maxWidth:'800px',
+                margin: '0 auto'
             }}>
 
                 {resultados.map((x, index) => (
@@ -322,9 +375,10 @@ export default function Taxi() {
 
                             </Box>
                         </CardContent>
-                        <CardActions disableSpacing>
+                        <CardActions disableSpacing sx={{display: 'flex', justifyContent: 'space-between'}}>
 
                             <IconButton onClick={() => handleExpandClick(index)}><Icon>expand_more</Icon></IconButton>
+                            <IconButton onClick={() => handleEdit(index)}><Icon color="info">edit</Icon></IconButton>
 
                         </CardActions>
                         <Collapse in={expandedId === index} timeout="auto" unmountOnExit>
@@ -358,6 +412,27 @@ export default function Taxi() {
                                 </Grid>
 
                             </CardContent>
+
+                            {/*                            <Grid container spacing={1} borderColor="gray"
+                                  sx={{m: 1, display: 'flex', justifyContent: 'center'}}>
+
+
+
+                                <Grid xs={6} sm={3}>Permissão</Grid>
+                                <Grid xs={6} sm={3} >{x.prefixo}</Grid>
+                                <Grid xs={6} sm={3}>Nome</Grid>
+                                <Grid xs={6} sm={3}>{x.nomePermissionario}</Grid>
+                                <Grid xs={6} sm={3}>Cotax permissionário</Grid>
+                                <Grid xs={6} sm={3}>{x.cotaxPermissionario}</Grid>
+                                <Grid xs={6} sm={3}>Vencimento</Grid>
+                                <Grid xs={6} sm={3}>{x.vencimentoPermissionario}</Grid>
+                                <Grid xs={6} sm={3}>Placa</Grid>
+                                <Grid xs={6} sm={3}>{x.placa}</Grid>
+                                <Grid xs={6} sm={3}>Selo</Grid>
+                                <Grid xs={6} sm={3}>{x.selo}</Grid>
+                            </Grid>*/}
+
+
                         </Collapse>
                     </Card>
                 ))}
@@ -409,7 +484,7 @@ export default function Taxi() {
                         <DialogContent>
 
 
-                            <form id="fiscalizacaoForm" onSubmit={handleSubmit}>
+                            <form id="fiscalizacaoForm" onSubmit={ editando.estado? handleEditSubmit : handleSubmit}>
                                 <Grid container spacing={1}>
 
                                     Veículo

@@ -50,6 +50,14 @@ export function putFiscalizacaoTaxi(fiscalizacao: TaxiFiscalizado) {
 
     postFiscalizacaoTaxi(resultadoLista);
 }
+
+export function atualizarFiscalizacaoTaxi(fiscalizacao: TaxiFiscalizado, indice: number) {
+    let resultadoLista: TaxiFiscalizado[] = getFiscalizacaoTaxi();
+    resultadoLista[indice] = fiscalizacao;
+
+    postFiscalizacaoTaxi(resultadoLista);
+}
+
 export function putFiscalizacaoAplicativo(fiscalizacao: aplicativoFiscalizado) {
     let resultadoLista: aplicativoFiscalizado[] = getFiscalizacaoAplicativo();
 
