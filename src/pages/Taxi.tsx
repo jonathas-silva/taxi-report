@@ -112,7 +112,7 @@ export default function Taxi() {
     const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
     function switchHandle(e: any) {
         setcondutorIgualPerm((e as any).target.checked); //vai retornar um false or true
-        if((e as any).target.checked){
+        if ((e as any).target.checked) {
             setState({
                 ...state,
                 nomeCondutor: "",
@@ -199,13 +199,13 @@ export default function Taxi() {
     const handleSelectChange = (event: SelectChangeEvent) => {
         const value = event.target.value;
 
-        if(value=='Liberado'){
+        if (value == 'Liberado') {
             setState({
                 ...state,
                 status: value,
                 numeroDocumento: ""
             });
-        }else{
+        } else {
             setState({
                 ...state,
                 status: value
@@ -410,55 +410,37 @@ export default function Taxi() {
 
                         </CardActions>
                         <Collapse in={expandedId === index} timeout="auto" unmountOnExit>
-                            <CardContent>
-
-                                <Grid container className="infoAdicionais">
-                                    <Grid xs={4} className="label">Cotax</Grid>
-                                    <Grid xs={8} className="dados">{x.cotaxPermissionario}</Grid>
-                                    <Grid xs={4} className="label">Válidade</Grid>
-                                    <Grid xs={8} className="dados">{formatadorDeData(x.vencimentoPermissionario)}</Grid>
-                                    <Grid xs={4} className="label">Placa</Grid>
-                                    <Grid xs={8} className="dados">{x.placa}</Grid>
-                                    <Grid xs={4} className="label">Selo</Grid>
-                                    <Grid xs={8} className="dados">{formatadordeSelo(x.selo)}</Grid>
-                                    <Grid xs={4} className="label">Ponto</Grid>
-                                    <Grid xs={8} className="dados">{x.ponto}</Grid>
-                                    <Grid xs={4} className="label">Cond.</Grid>
-
-                                    {
-                                        x.nomeCondutor == "" ?
-                                            <Grid xs={8} className="dados">O mesmo</Grid> :
-                                            <>
-                                                <Grid xs={8} className="dados"> {x.nomeCondutor}</Grid>
-                                                <Grid xs={4} className="label">Cotax cond.</Grid>
-                                                <Grid xs={8} className="dados"> {x.cotaxCondutor}</Grid>
-                                                <Grid xs={4} className="label">Validade cond.</Grid>
-                                                <Grid xs={8}
-                                                      className="dados"> {formatadorDeData(x.vencimentoCondutor)}</Grid>
-                                            </>
-                                    }
-                                </Grid>
-
-                            </CardContent>
-
-                            {/*                            <Grid container spacing={1} borderColor="gray"
-                                  sx={{m: 1, display: 'flex', justifyContent: 'center'}}>
 
 
-
-                                <Grid xs={6} sm={3}>Permissão</Grid>
-                                <Grid xs={6} sm={3} >{x.prefixo}</Grid>
-                                <Grid xs={6} sm={3}>Nome</Grid>
-                                <Grid xs={6} sm={3}>{x.nomePermissionario}</Grid>
-                                <Grid xs={6} sm={3}>Cotax permissionário</Grid>
+                            <Grid container className="gridContainer" paddingX={1} bgcolor="aliceblue">
+                                <Grid xs={6} sm={3}>Cotax:</Grid>
                                 <Grid xs={6} sm={3}>{x.cotaxPermissionario}</Grid>
-                                <Grid xs={6} sm={3}>Vencimento</Grid>
+                                <Grid xs={6} sm={3}>Vencimento:</Grid>
                                 <Grid xs={6} sm={3}>{x.vencimentoPermissionario}</Grid>
-                                <Grid xs={6} sm={3}>Placa</Grid>
+                            </Grid>
+                            <Grid container  className="gridContainer"  paddingX={1} bgcolor="#F2FBF8">
+                                <Grid xs={6} sm={3}>Ponto:</Grid>
+                                <Grid xs={6} sm={3}>{x.ponto}</Grid>
+                                <Grid xs={6} sm={3}>Condutor:</Grid>
+                                <Grid xs={6} sm={3}>{x.nomeCondutor == ""? "O mesmo" : x.nomeCondutor}</Grid>
+                            </Grid>
+                            { x.nomeCondutor == "" ? <div></div> :
+                                <Grid container  className="gridContainer" paddingX={1} bgcolor="#F2FBF8">
+                                <Grid xs={6} sm={3}>Cotax condutor:</Grid>
+                                <Grid xs={6} sm={3}>{x.cotaxCondutor}</Grid>
+                                <Grid xs={6} sm={3}>Vencimento:</Grid>
+                                <Grid xs={6} sm={3}>{x.vencimentoCondutor}</Grid>
+                            </Grid>}
+                            <Grid container  className="gridContainer" paddingX={1} bgcolor="aliceblue">
+                                <Grid xs={6} sm={3}>Placa:</Grid>
                                 <Grid xs={6} sm={3}>{x.placa}</Grid>
-                                <Grid xs={6} sm={3}>Selo</Grid>
+                                <Grid xs={6} sm={3}>Validade Selo:</Grid>
                                 <Grid xs={6} sm={3}>{x.selo}</Grid>
-                            </Grid>*/}
+                            </Grid>
+
+                            <Grid container  className="gridContainer" paddingX={1} bgcolor="#F2FBF8">
+                                <Grid xs={12} sm={12}>{`Observações: ${x.observacoes}`}</Grid>
+                            </Grid>
 
 
                         </Collapse>
@@ -513,7 +495,7 @@ export default function Taxi() {
 
 
                             <form id="fiscalizacaoForm" onSubmit={editando.estado ? handleEditSubmit : handleSubmit}>
-                                <Grid container spacing={1}>
+                                <Grid container >
 
                                     Veículo
                                     <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>
@@ -635,46 +617,46 @@ export default function Taxi() {
 
 
                                         {
-                                            condutorIgualPerm? <div></div> :
-                                            <Grid container>
-                                            <Grid xs={12} sm={12}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="nomeCondutor"
-                                                    value={state.nomeCondutor}
-                                                    onChange={handleChange}
-                                                    variant="standard"
-                                                    label="Nome do condutor"
-                                                />
-                                            </Grid>
+                                            condutorIgualPerm ? <div></div> :
+                                                <Grid container>
+                                                    <Grid xs={12} sm={12}>
+                                                        <TextField
+                                                            fullWidth
+                                                            id="nomeCondutor"
+                                                            value={state.nomeCondutor}
+                                                            onChange={handleChange}
+                                                            variant="standard"
+                                                            label="Nome do condutor"
+                                                        />
+                                                    </Grid>
 
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="cotaxCondutor"
-                                                    value={state.cotaxCondutor}
-                                                    onChange={handleChange}
-                                                    variant="standard"
-                                                    label="Cotax do condutor"
-                                                    type="number"
-                                                />
-                                            </Grid>
-                                            <Grid xs={12} sm={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    id="vencimentoCondutor"
-                                                    variant="standard"
-                                                    value={state.vencimentoCondutor}
-                                                    onChange={handleChange}
-                                                    label="validade"
-                                                    type="date"
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                />
-                                            </Grid>
+                                                    <Grid xs={12} sm={6}>
+                                                        <TextField
+                                                            fullWidth
+                                                            id="cotaxCondutor"
+                                                            value={state.cotaxCondutor}
+                                                            onChange={handleChange}
+                                                            variant="standard"
+                                                            label="Cotax do condutor"
+                                                            type="number"
+                                                        />
+                                                    </Grid>
+                                                    <Grid xs={12} sm={6}>
+                                                        <TextField
+                                                            fullWidth
+                                                            id="vencimentoCondutor"
+                                                            variant="standard"
+                                                            value={state.vencimentoCondutor}
+                                                            onChange={handleChange}
+                                                            label="validade"
+                                                            type="date"
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                        />
+                                                    </Grid>
 
-                                        </Grid>}
+                                                </Grid>}
                                     </Grid>
 
 

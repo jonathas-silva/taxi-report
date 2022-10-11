@@ -42,3 +42,16 @@ paper da MUI*/
     text-align: left;
     /*border: 1px solid lightgray;*/
 }
+
+.detalhes {
+    border-bottom: 0.1em solid lightgray;
+}
+
+.gridContainer {
+    display: flex;
+    justify-content: center;
+    text-align: left;
+    margin-bottom: 0;
+    margin-top: 5em;
+    border-bottom: 1px solid lightgray;
+}
