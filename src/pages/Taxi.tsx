@@ -105,13 +105,21 @@ export default function Taxi() {
     const [open, setOpen] = useState(false);
     const [openDialogLimpar, setOpenDialogLimpar] = useState(false);
     const [openMenu, setOpenMenu] = useState(false);
-    const [editando, setEditando] = useState({estado: false, indice:- 1});
+    const [editando, setEditando] = useState({estado: false, indice: -1});
 
     const [dialogSalvar, setDialogSalvar] = useState(false);
     const [expandedId, setExpandedId] = React.useState(-1);
     const [condutorIgualPerm, setcondutorIgualPerm] = useState(true); //controla o switch de mostrar o condutor
     function switchHandle(e: any) {
         setcondutorIgualPerm((e as any).target.checked); //vai retornar um false or true
+        if((e as any).target.checked){
+            setState({
+                ...state,
+                nomeCondutor: "",
+                cotaxCondutor: "",
+                vencimentoCondutor: ""
+            })
+        }
     }
 
 
@@ -127,7 +135,13 @@ export default function Taxi() {
 
     }
 
+    /*Este botão será chamado quando fecharmos o Dialog no modo de edição e criação. Quando clicado ele
+    * zera todos os estados.*/
     const handleClose = () => {
+
+        setEditando({estado: false, indice: -1});
+        setcondutorIgualPerm(true);
+        setState(estadoInicial);
         setOpen(false);
         setAtualizar(!atualizar)
     };
@@ -143,12 +157,11 @@ export default function Taxi() {
         //aqui estamos mudando o estado do formulário para 'editando'.
         setEditando({estado: true, indice: indice});
 
-        console.log(`Para o índice ${indice} temos: `);
-        console.log(resultados[indice]);
+        console.log(indice);
 
         setState(resultados[indice]);
 
-        if(resultados[indice].nomeCondutor == ""){
+        if (resultados[indice].nomeCondutor == "") {
             setcondutorIgualPerm(true);
         } else {
             setcondutorIgualPerm(false);
@@ -164,15 +177,17 @@ export default function Taxi() {
 
     const handleEditSubmit = (e: any) => {
         e.preventDefault();
+        console.log(condutorIgualPerm);
+
+        console.log(state);
         atualizarFiscalizacaoTaxi(state, editando.indice);
         setOpen(false);
         setState(estadoInicial);
         setAtualizar(!atualizar);
         setcondutorIgualPerm(true);
+        console.log(editando.indice);
         setEditando({estado: false, indice: -1});
-
-
-
+        console.log(editando.indice);
     }
 
     function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void {
@@ -211,13 +226,20 @@ export default function Taxi() {
             console.log("formulário vazio. Nada será registrado")
         } else {
 
+            if (condutorIgualPerm) {
+                state.nomeCondutor == "";
+                state.cotaxCondutor = "";
+                state.vencimentoCondutor = "";
+            }
             console.log("Tentando salvar os resultados: ");
             console.log(state);
             putFiscalizacaoTaxi(state);
+
             //zerando o state novamente
             setState(estadoInicial);
             setAtualizar(!atualizar);
             setcondutorIgualPerm(true);
+
         }
 
     }
@@ -278,8 +300,10 @@ export default function Taxi() {
     const handleClickOpen = () => {
 
 
-        /*Setando a data e hora no momento em que abriu-se o modal*/
+        //Assegurando que quando clicar no botão '+' não estamos utilizando uma nova entrada.
+        setEditando({estado: false, indice: -1});
 
+        /*Setando a data e hora no momento em que abriu-se o modal*/
         let data = new Date();
 
         const horarioFormatado: string = data.toLocaleString('pt-BR', dataEHoraBrasileira);
@@ -347,7 +371,7 @@ export default function Taxi() {
 
             <Box sx={{
                 pt: 4,
-                maxWidth:'800px',
+                maxWidth: '800px',
                 margin: '0 auto'
             }}>
 
@@ -484,7 +508,7 @@ export default function Taxi() {
                         <DialogContent>
 
 
-                            <form id="fiscalizacaoForm" onSubmit={ editando.estado? handleEditSubmit : handleSubmit}>
+                            <form id="fiscalizacaoForm" onSubmit={editando.estado ? handleEditSubmit : handleSubmit}>
                                 <Grid container spacing={1}>
 
                                     Veículo
@@ -600,52 +624,53 @@ export default function Taxi() {
                                                 <Switch
                                                     checked={condutorIgualPerm}
                                                     onChange={switchHandle}/>
+
                                             }
                                             label="Condutor e permissionário são a mesma pessoa"
                                         />
+
+
                                         {
-                                            condutorIgualPerm ? <div></div> :
-                                                <Grid container>
-                                                    <Grid xs={12} sm={12}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="nomeCondutor"
-                                                            value={condutorIgualPerm ? state.nomePermissionario : state.nomeCondutor}
-                                                            onChange={handleChange}
-                                                            variant="standard"
-                                                            label="Nome do condutor"
-                                                        />
-                                                    </Grid>
+                                            condutorIgualPerm? <div></div> :
+                                            <Grid container>
+                                            <Grid xs={12} sm={12}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="nomeCondutor"
+                                                    value={state.nomeCondutor}
+                                                    onChange={handleChange}
+                                                    variant="standard"
+                                                    label="Nome do condutor"
+                                                />
+                                            </Grid>
 
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="cotaxCondutor"
-                                                            value={condutorIgualPerm ? state.cotaxPermissionario : state.cotaxCondutor}
-                                                            onChange={handleChange}
-                                                            variant="standard"
-                                                            label="Cotax do condutor"
-                                                            type="number"
-                                                        />
-                                                    </Grid>
-                                                    <Grid xs={12} sm={6}>
-                                                        <TextField
-                                                            fullWidth
-                                                            id="vencimentoCondutor"
-                                                            variant="standard"
-                                                            value={condutorIgualPerm ? state.vencimentoPermissionario : state.vencimentoCondutor}
-                                                            onChange={handleChange}
-                                                            label="validade"
-                                                            type="date"
-                                                            InputLabelProps={{
-                                                                shrink: true,
-                                                            }}
-                                                        />
-                                                    </Grid>
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="cotaxCondutor"
+                                                    value={state.cotaxCondutor}
+                                                    onChange={handleChange}
+                                                    variant="standard"
+                                                    label="Cotax do condutor"
+                                                    type="number"
+                                                />
+                                            </Grid>
+                                            <Grid xs={12} sm={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    id="vencimentoCondutor"
+                                                    variant="standard"
+                                                    value={state.vencimentoCondutor}
+                                                    onChange={handleChange}
+                                                    label="validade"
+                                                    type="date"
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                />
+                                            </Grid>
 
-                                                </Grid>}
-
-
+                                        </Grid>}
                                     </Grid>
 
 
@@ -712,7 +737,7 @@ export default function Taxi() {
                             <Button onClick={() => handleClose()}>Cancelar</Button>
 
                             {/*botão de submit do formulário 'fiscalizacaoForm'*/}
-                            <Button form="fiscalizacaoForm" type="submit" onClick={() => handleClose()}>Salvar</Button>
+                            <Button form="fiscalizacaoForm" type="submit" onClick={() => setOpen(false)}>Salvar</Button>
                         </DialogActions>
 
                     </Dialog>
