@@ -147,7 +147,6 @@ export default function Taxi() {
     };
 
     function handleDelete(index: number) {
-        console.log("chegamos até o handle delete! Index = " + index);
         deletarEntradaTaxi(index);
         setAtualizar(!atualizar);
     }
@@ -157,7 +156,6 @@ export default function Taxi() {
         //aqui estamos mudando o estado do formulário para 'editando'.
         setEditando({estado: true, indice: indice});
 
-        console.log(indice);
 
         setState(resultados[indice]);
 
@@ -177,17 +175,14 @@ export default function Taxi() {
 
     const handleEditSubmit = (e: any) => {
         e.preventDefault();
-        console.log(condutorIgualPerm);
 
-        console.log(state);
         atualizarFiscalizacaoTaxi(state, editando.indice);
         setOpen(false);
         setState(estadoInicial);
         setAtualizar(!atualizar);
         setcondutorIgualPerm(true);
-        console.log(editando.indice);
         setEditando({estado: false, indice: -1});
-        console.log(editando.indice);
+
     }
 
     function handleChange(e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void {
@@ -203,10 +198,20 @@ export default function Taxi() {
     //gerar alguns erros em tempo de execução
     const handleSelectChange = (event: SelectChangeEvent) => {
         const value = event.target.value;
-        setState({
-            ...state,
-            status: value
-        });
+
+        if(value=='Liberado'){
+            setState({
+                ...state,
+                status: value,
+                numeroDocumento: ""
+            });
+        }else{
+            setState({
+                ...state,
+                status: value
+            });
+        }
+
     };
 
     function handleSubmit(e: any) {
@@ -231,8 +236,7 @@ export default function Taxi() {
                 state.cotaxCondutor = "";
                 state.vencimentoCondutor = "";
             }
-            console.log("Tentando salvar os resultados: ");
-            console.log(state);
+
             putFiscalizacaoTaxi(state);
 
             //zerando o state novamente
