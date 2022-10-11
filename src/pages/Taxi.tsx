@@ -6,6 +6,7 @@ import {
     CardActions,
     CardContent,
     CardHeader,
+    Chip,
     Collapse,
     Container,
     Dialog,
@@ -380,8 +381,8 @@ export default function Taxi() {
             }}>
 
                 {resultados.map((x, index) => (
-                    <Card sx={{m: 1, bgcolor: "white"}} variant="elevation" key={index}>
-                        <CardHeader sx={{textAlign: 'left'}}
+                    <Card sx={{m: 1, p:0, bgcolor: "white"}} variant="elevation" key={index}>
+                        <CardHeader sx={{m:0, p:1,textAlign: 'left', bgcolor:'#fff'}}
                                     action={
                                         <IconButton onClick={() => handleDelete(index)}>
                                             <Icon>delete</Icon>
@@ -391,19 +392,20 @@ export default function Taxi() {
                                     subheader={x.nomePermissionario}
                         >
                         </CardHeader>
-                        <CardContent>
+                        <CardContent sx={{bgcolor:'#fff'}}>
                             <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                                <Typography className="detalhe">{x.horario} </Typography>
+                                <Typography className="detalhe">Ponto {x.ponto} - {x.horario}</Typography>
+
 
                                 {
                                     x.status == "Liberado" ?
-                                        <Typography className="coisaBoa">{x.status}</Typography> :
-                                        <Typography className="coisaRuim">{x.status}</Typography>
+                                        <Chip label={x.status} color="primary"></Chip> :
+                                        <Chip label={x.status} color="warning"></Chip>
                                 }
 
                             </Box>
                         </CardContent>
-                        <CardActions disableSpacing sx={{display: 'flex', justifyContent: 'space-between'}}>
+                        <CardActions sx={{m:0, p:0,display: 'flex', justifyContent: 'space-between'}}>
 
                             <IconButton onClick={() => handleExpandClick(index)}><Icon>expand_more</Icon></IconButton>
                             <IconButton onClick={() => handleEdit(index)}><Icon color="info">edit</Icon></IconButton>
@@ -412,35 +414,37 @@ export default function Taxi() {
                         <Collapse in={expandedId === index} timeout="auto" unmountOnExit>
 
 
-                            <Grid container className="gridContainer" paddingX={1} bgcolor="aliceblue">
-                                <Grid xs={6} sm={3}>Cotax:</Grid>
+                            <Grid container className="gridContainer radiusContainer" paddingX={1} bgcolor="#FBFBFF">
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Cotax Permissionário:</Grid>
                                 <Grid xs={6} sm={3}>{x.cotaxPermissionario}</Grid>
-                                <Grid xs={6} sm={3}>Vencimento:</Grid>
-                                <Grid xs={6} sm={3}>{x.vencimentoPermissionario}</Grid>
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Vencimento:</Grid>
+                                <Grid xs={6} sm={3}>{formatadorDeData(x.vencimentoPermissionario)}</Grid>
                             </Grid>
-                            <Grid container  className="gridContainer"  paddingX={1} bgcolor="#F2FBF8">
-                                <Grid xs={6} sm={3}>Ponto:</Grid>
+                            <Grid container  className="gridContainer"  paddingX={1} bgcolor="#FBFBFF">
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Ponto:</Grid>
                                 <Grid xs={6} sm={3}>{x.ponto}</Grid>
-                                <Grid xs={6} sm={3}>Condutor:</Grid>
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Condutor:</Grid>
                                 <Grid xs={6} sm={3}>{x.nomeCondutor == ""? "O mesmo" : x.nomeCondutor}</Grid>
                             </Grid>
                             { x.nomeCondutor == "" ? <div></div> :
-                                <Grid container  className="gridContainer" paddingX={1} bgcolor="#F2FBF8">
-                                <Grid xs={6} sm={3}>Cotax condutor:</Grid>
+                                <Grid container  className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Cotax condutor:</Grid>
                                 <Grid xs={6} sm={3}>{x.cotaxCondutor}</Grid>
-                                <Grid xs={6} sm={3}>Vencimento:</Grid>
-                                <Grid xs={6} sm={3}>{x.vencimentoCondutor}</Grid>
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Vencimento:</Grid>
+                                <Grid xs={6} sm={3}>{formatadorDeData(x.vencimentoCondutor)}</Grid>
                             </Grid>}
-                            <Grid container  className="gridContainer" paddingX={1} bgcolor="aliceblue">
-                                <Grid xs={6} sm={3}>Placa:</Grid>
+                            <Grid container  className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Placa:</Grid>
                                 <Grid xs={6} sm={3}>{x.placa}</Grid>
-                                <Grid xs={6} sm={3}>Validade Selo:</Grid>
-                                <Grid xs={6} sm={3}>{x.selo}</Grid>
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Validade Selo:</Grid>
+                                <Grid xs={6} sm={3}>{formatadordeSelo(x.selo)}</Grid>
                             </Grid>
 
-                            <Grid container  className="gridContainer" paddingX={1} bgcolor="#F2FBF8">
-                                <Grid xs={12} sm={12}>{`Observações: ${x.observacoes}`}</Grid>
-                            </Grid>
+                            {
+                                x.observacoes == "" ? <div></div> :
+                                <Grid container className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
+                                <Grid xs={12} sm={12}><strong>Observações:</strong> {x.observacoes}</Grid>
+                            </Grid>}
 
 
                         </Collapse>

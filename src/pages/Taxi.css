@@ -38,7 +38,7 @@ paper da MUI*/
 }
 
 .infoAdicionais {
-    color: whitesmoke;
+    color: #d8d7f6;
     text-align: left;
     /*border: 1px solid lightgray;*/
 }
@@ -53,5 +53,9 @@ paper da MUI*/
     text-align: left;
     margin-bottom: 0;
     margin-top: 5em;
-    border-bottom: 1px solid lightgray;
+    border-top: 1px solid lightgray;
+}
+
+.radiusContainer {
+    border-radius: 5px 5px 0 0;
 }
