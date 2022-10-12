@@ -381,8 +381,8 @@ export default function Taxi() {
             }}>
 
                 {resultados.map((x, index) => (
-                    <Card sx={{m: 1, p:0, bgcolor: "white"}} variant="elevation" key={index}>
-                        <CardHeader sx={{m:0, p:1,textAlign: 'left', bgcolor:'#fff'}}
+                    <Card sx={{m: 1, p: 0, bgcolor: "white"}} variant="elevation" key={index}>
+                        <CardHeader sx={{m: 0, p: 1, textAlign: 'left', bgcolor: '#fff'}}
                                     action={
                                         <IconButton onClick={() => handleDelete(index)}>
                                             <Icon>delete</Icon>
@@ -392,7 +392,7 @@ export default function Taxi() {
                                     subheader={x.nomePermissionario}
                         >
                         </CardHeader>
-                        <CardContent sx={{bgcolor:'#fff'}}>
+                        <CardContent sx={{bgcolor: '#fff'}}>
                             <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                                 <Typography className="detalhe">Ponto {x.ponto} - {x.horario}</Typography>
 
@@ -405,7 +405,7 @@ export default function Taxi() {
 
                             </Box>
                         </CardContent>
-                        <CardActions sx={{m:0, p:0,display: 'flex', justifyContent: 'space-between'}}>
+                        <CardActions sx={{m: 0, p: 0, display: 'flex', justifyContent: 'space-between'}}>
 
                             <IconButton onClick={() => handleExpandClick(index)}><Icon>expand_more</Icon></IconButton>
                             <IconButton onClick={() => handleEdit(index)}><Icon color="info">edit</Icon></IconButton>
@@ -415,25 +415,19 @@ export default function Taxi() {
 
 
                             <Grid container className="gridContainer radiusContainer" paddingX={1} bgcolor="#FBFBFF">
-                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Cotax Permissionário:</Grid>
+                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Cotax Perm.:</Grid>
                                 <Grid xs={6} sm={3}>{x.cotaxPermissionario}</Grid>
                                 <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Vencimento:</Grid>
                                 <Grid xs={6} sm={3}>{formatadorDeData(x.vencimentoPermissionario)}</Grid>
                             </Grid>
-                            <Grid container  className="gridContainer"  paddingX={1} bgcolor="#FBFBFF">
-                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Ponto:</Grid>
-                                <Grid xs={6} sm={3}>{x.ponto}</Grid>
-                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Condutor:</Grid>
-                                <Grid xs={6} sm={3}>{x.nomeCondutor == ""? "O mesmo" : x.nomeCondutor}</Grid>
-                            </Grid>
-                            { x.nomeCondutor == "" ? <div></div> :
-                                <Grid container  className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
-                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Cotax condutor:</Grid>
-                                <Grid xs={6} sm={3}>{x.cotaxCondutor}</Grid>
-                                <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Vencimento:</Grid>
-                                <Grid xs={6} sm={3}>{formatadorDeData(x.vencimentoCondutor)}</Grid>
-                            </Grid>}
-                            <Grid container  className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
+                            {x.nomeCondutor == "" ? <div></div> :
+                                <Grid container className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
+                                    <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Cotax Cond.:</Grid>
+                                    <Grid xs={6} sm={3} >{x.cotaxCondutor}</Grid>
+                                    <Grid xs={6} sm={3}  sx={{fontWeight: 'bold'}}>Vencimento:</Grid>
+                                    <Grid xs={6} sm={3}>{formatadorDeData(x.vencimentoCondutor)}</Grid>
+                                </Grid>}
+                            <Grid container className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
                                 <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Placa:</Grid>
                                 <Grid xs={6} sm={3}>{x.placa}</Grid>
                                 <Grid xs={6} sm={3} sx={{fontWeight: 'bold'}}>Validade Selo:</Grid>
@@ -442,9 +436,9 @@ export default function Taxi() {
 
                             {
                                 x.observacoes == "" ? <div></div> :
-                                <Grid container className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
-                                <Grid xs={12} sm={12}><strong>Observações:</strong> {x.observacoes}</Grid>
-                            </Grid>}
+                                    <Grid container className="gridContainer" paddingX={1} bgcolor="#FBFBFF">
+                                        <Grid xs={12} sm={12}><strong>Observações:</strong> {x.observacoes}</Grid>
+                                    </Grid>}
 
 
                         </Collapse>
@@ -494,12 +488,12 @@ export default function Taxi() {
 
                     <Dialog open={open} onClose={() => handleClose()}>
 
-                        <DialogTitle>Nova entrada</DialogTitle>
+                        <DialogTitle>{editando.estado == true ? "Editar entrada" : "Nova entrada"}</DialogTitle>
                         <DialogContent>
 
 
                             <form id="fiscalizacaoForm" onSubmit={editando.estado ? handleEditSubmit : handleSubmit}>
-                                <Grid container >
+                                <Grid container>
 
                                     Veículo
                                     <Grid xs={12} className="papel" sx={{mb: 2, p: 1}}>

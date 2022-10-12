@@ -51,11 +51,10 @@ paper da MUI*/
     display: flex;
     justify-content: center;
     text-align: left;
-    margin-bottom: 0;
-    margin-top: 5em;
-    border-top: 1px solid lightgray;
+
 }
 
 .radiusContainer {
+    border-top: 1px solid lightgray;
     border-radius: 5px 5px 0 0;
 }
